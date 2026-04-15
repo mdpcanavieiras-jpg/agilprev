@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgilPrev - Inteligência Artificial para o INSS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .bg-agil-blue { background-color: #2563EB; }
+        .text-agil-blue { color: #2563EB; }
+        .bg-agil-green { background-color: #22C55E; }
+        .text-agil-green { color: #22C55E; }
+        .bg-agil-yellow { background-color: #FACC15; }
+        .text-agil-yellow { color: #FACC15; }
+
+        /* Logo Colors */
+        .text-logo-green { color: #84CC16; }
+        .text-logo-blue { color: #3B82F6; }
+
+        /* Scroll Reveal Base Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+            will-change: opacity, transform;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Pulsing Button Animation */
+        @keyframes pulse-button {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        .animate-pulse-button {
+            animation: pulse-button 2.5s infinite ease-in-out;
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        .animate-float-delayed {
+            animation: float 6s ease-in-out infinite;
+            animation-delay: 2s;
+        }
+        .animate-float-slow {
+            animation: float 8s ease-in-out infinite;
+            animation-delay: 1s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        
+        .delay-100 { transition-delay: 100ms; animation-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; animation-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; animation-delay: 300ms; }
+        .delay-400 { transition-delay: 400ms; animation-delay: 400ms; }
+        .delay-500 { transition-delay: 500ms; animation-delay: 500ms; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        /* Modal bottom-sheet → desktop centered */
+        @media (min-width: 640px) {
+            .modal-card {
+                border-radius: 20px !important;
+                max-height: 90vh;
+            }
+        }
+
+        /* Gradiente azul do chat (mesmo padrão do original) */
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #2563eb 100%);
+        }
+
+        /* Cores personalizadas com suporte a variantes (opacidade, borda, sombra) */
+        .border-agil-blue  { border-color: #2563EB; }
+        .border-agil-green { border-color: #22C55E; }
+        .shadow-agil-blue\/30 { box-shadow: 0 10px 25px -5px rgba(37,99,235,0.3); }
+        .shadow-agil-green\/30 { box-shadow: 0 10px 25px -5px rgba(34,197,94,0.3); }
+        .shadow-blue-500\/30 { box-shadow: 0 10px 25px -5px rgba(59,130,246,0.3); }
+        .shadow-green-500\/25 { box-shadow: 0 10px 25px -5px rgba(34,197,94,0.25); }
+        .bg-agil-blue\/10 { background-color: rgba(37,99,235,0.1); }
+        .bg-agil-green\/10 { background-color: rgba(34,197,94,0.1); }
+        .bg-agil-green\/20 { background-color: rgba(34,197,94,0.2); }
+        .border-agil-green\/30 { border-color: rgba(34,197,94,0.3); }
+        .border-agil-blue\/20 { border-color: rgba(37,99,235,0.2); }
+        .border-agil-blue\/30 { border-color: rgba(37,99,235,0.3); }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-white text-gray-900 overflow-x-hidden">
+    <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

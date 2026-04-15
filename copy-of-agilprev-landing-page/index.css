@@ -1,0 +1,2 @@
+/* Estilos globais adicionais — as principais custom classes estão no <style> do index.html */
+*, *::before, *::after { box-sizing: border-box; }

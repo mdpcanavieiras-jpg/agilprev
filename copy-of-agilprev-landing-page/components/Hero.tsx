@@ -1,0 +1,76 @@
+import React from 'react';
+import { Check, MessageSquare } from 'lucide-react';
+import MiniChat from './MiniChat';
+
+interface HeroProps {
+  onOpenModal: () => void;
+  onStartChat: (type: 'documento' | 'premium') => void;
+}
+
+const AgilCheck = () => (
+  <div className="flex items-center justify-center w-6 h-6 rounded-full border border-white/40 shrink-0">
+    <div className="w-4 h-4 rounded-full bg-agil-yellow flex items-center justify-center">
+      <Check size={10} strokeWidth={5} className="text-agil-blue" />
+    </div>
+  </div>
+);
+
+const Hero: React.FC<HeroProps> = ({ onOpenModal, onStartChat }) => {
+  return (
+    <section className="bg-agil-blue pt-16 pb-24 relative overflow-hidden px-4">
+      <div className="max-w-6xl mx-auto relative z-10">
+
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+
+          {/* ── Coluna esquerda: copy ── */}
+          <div className="text-center lg:text-left">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-extrabold text-white leading-[1.1] mb-6 tracking-tight">
+              A <span className="text-agil-yellow">Inteligência Artificial</span> que ajuda a resolver seu problema com o INSS!
+            </h1>
+
+            <p className="text-blue-100 text-lg md:text-xl lg:text-2xl font-medium mb-8 leading-relaxed">
+              É rápido, prático e em minutos emitimos uma saída para o seu caso.
+            </p>
+
+            {/* Checklist */}
+            <div className="flex flex-col gap-3 mb-8">
+              {['Sem taxa de sucesso', 'Resultado em minutos', 'Atendimento 100% online'].map(item => (
+                <div key={item} className="flex items-center gap-3 justify-center lg:justify-start">
+                  <AgilCheck />
+                  <span className="text-white font-bold text-sm uppercase tracking-wider">{item}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA direto (para quem não quer usar o chat) */}
+            <button
+              type="button"
+              onClick={onOpenModal}
+              className="w-full sm:w-auto bg-agil-green text-white px-10 py-4 rounded-2xl font-black text-lg hover:bg-green-600 shadow-xl shadow-green-900/30 transition-all active:scale-95 animate-pulse-button flex items-center justify-center gap-3 mx-auto lg:mx-0"
+            >
+              <MessageSquare size={22} />
+              RESOLVER MEU CASO AGORA
+            </button>
+          </div>
+
+          {/* ── Coluna direita: mini-chat ── */}
+          <div>
+            {/* Label acima do chat */}
+            <div className="flex items-center gap-3 mb-4 justify-center lg:justify-start">
+              <div className="flex-1 h-px bg-white/20 max-w-[60px]" />
+              <p className="text-white/70 text-xs font-bold uppercase tracking-[0.2em] whitespace-nowrap">
+                Ou tire sua dúvida agora, de graça
+              </p>
+              <div className="flex-1 h-px bg-white/20 max-w-[60px]" />
+            </div>
+
+            <MiniChat onStartChat={onStartChat} />
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Hero;
