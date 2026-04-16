@@ -69,7 +69,24 @@ app.post('/api/session', async (req, res) => {
     res.status(500).json({ success: false, error: e.message });
   }
 });
+app.post('/api/enviar-email', async (req, res) => {
+  try {
+    const { email, nome } = req.body;
 
+    const response = await resend.emails.send({
+      from: 'Agilprev <onboarding@resend.dev>',
+      to: email,
+      subject: 'Seu documento Agilprev',
+      html: `<p>Olá ${nome}, seu documento foi gerado com sucesso.</p>`,
+    });
+
+    res.json({ success: true, data: response });
+
+  } catch (error) {
+    console.error('Erro ao enviar email:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 // ════════════════════════════════════════════════════════════════
 // POST /api/create-charge — Criar cobrança PIX no OpenPix
 // ════════════════════════════════════════════════════════════════
