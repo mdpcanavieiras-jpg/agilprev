@@ -49,7 +49,7 @@ const LABELS = {
 // ════════════════════════════════════════════════════════════════
 app.post('/api/session', async (req, res) => {
   try {
-    const { sessionId, serviceType, conversationData } = req.body;
+    const { sessionId, serviceType, conversationData, nome, email } = req.body;
     const id = sessionId || uuidv4();
 
     const { error } = await supabase
@@ -58,6 +58,8 @@ app.post('/api/session', async (req, res) => {
         id,
         service_type: serviceType,
         conversation_data: conversationData,
+        nome,
+        email,
         status: 'chat',
         updated_at: new Date().toISOString(),
       }, { onConflict: 'id' });
@@ -184,22 +186,60 @@ app.post('/api/openpix/webhook', async (req, res) => {
       // Atualizar status no Supabase
       await supabase
         .from('agil_payments')
-        .update({ status: 'paid', paid_at: new Date().toISOString() })
+        .update({
+          status: 'paid',
+          paid_at: new Date().toISOString()
+        })
         .eq('correlation_id', correlationID);
 
       await supabase
         .from('agil_sessions')
-        .update({ status: 'paid', updated_at: new Date().toISOString() })
+        .update({
+          status: 'paid',
+          updated_at: new Date().toISOString()
+        })
         .eq('id', sessionId);
 
       console.log(`✅ Pagamento confirmado para sessão: ${sessionId}`);
+
+      // Buscar dados da sessão para envio de e-mail
+      const { data: sessionData, error: sessionError } = await supabase
+        .from('agil_sessions')
+        .select('*')
+        .eq('id', sessionId)
+        .single();
+
+      if (sessionError) {
+        console.error('Erro buscando sessão:', sessionError.message);
+      } else {
+        const email = sessionData?.email;
+        const nome = sessionData?.nome || 'Cliente';
+
+        if (email) {
+          try {
+            await resend.emails.send({
+              from: 'Agilprev <contato@agilprev.com.br>',
+              to: [email],
+              subject: 'Pagamento aprovado - Agilprev',
+              html: `<p>Olá ${nome}, seu pagamento foi aprovado com sucesso. Seu atendimento no Agilprev foi liberado.</p>`,
+            });
+
+            console.log('✅ E-mail enviado para:', email);
+          } catch (emailError) {
+            console.error('Erro ao enviar e-mail:', emailError.message);
+          }
+        } else {
+          console.log('Sessão sem e-mail cadastrado:', sessionId);
+        }
+      }
     }
 
     // OpenPix exige HTTP 200 com corpo específico
-    res.status(200).json({ message: 'ok' });
+    return res.status(200).json({ message: 'ok' });
+
   } catch (e) {
     console.error('webhook error:', e.message);
-    res.status(200).json({ message: 'ok' }); // Sempre retornar 200 para o OpenPix
+    return res.status(200).json({ message: 'ok' }); // sempre retornar 200 para a OpenPix
   }
 });
 
