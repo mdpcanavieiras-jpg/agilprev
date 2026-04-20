@@ -30,7 +30,10 @@ const OPENPIX_BASE   = 'https://api.openpix.com.br/api/v1';
 
 const openpix = axios.create({
   baseURL: OPENPIX_BASE,
-  headers: { Authorization: `appID ${OPENPIX_APP_ID}` },
+  headers: {
+    Authorization: OPENPIX_APP_ID,
+    'Content-Type': 'application/json',
+  },
 });
 
 // ─── Preços por tipo de serviço ──────────────────────────────────

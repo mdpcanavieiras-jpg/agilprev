@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL as string || 'http://localhost:3333';
+const API_BASE = 'https://agilprev-production.up.railway.app';
 
 export interface ChargeResult {
   success: boolean;
