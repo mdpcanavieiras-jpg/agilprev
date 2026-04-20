@@ -184,8 +184,18 @@ app.post('/api/openpix/webhook', async (req, res) => {
 
     if (event === 'OPENPIX:CHARGE_COMPLETED' && correlationID) {
       // Extrair sessionId do correlationID (formato: agil-{sessionId})
-      const parts = correlationID.split('-');
-const sessionId = parts[1];
+      const { data: paymentRow, error: paymentError } = await supabase
+  .from('agil_payments')
+  .select('session_id')
+  .eq('correlation_id', correlationID)
+  .single();
+
+if (paymentError || !paymentRow) {
+  console.error('Erro buscando pagamento pelo correlationID:', paymentError?.message || 'não encontrado');
+  return res.status(200).json({ message: 'ok' });
+}
+
+const sessionId = paymentRow.session_id;
 
       // Atualizar status no Supabase
       await supabase
