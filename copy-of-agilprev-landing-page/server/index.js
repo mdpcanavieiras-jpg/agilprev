@@ -103,7 +103,7 @@ app.post('/api/create-charge', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Dados inválidos.' });
     }
 
-    const correlationID = `agil-${sessionId}`;
+    const correlationID = `agil-${sessionId}-${Date.now()}`;
     const value = PRICES[serviceType];
 
     const { data } = await openpix.post('/charge', {
@@ -184,7 +184,8 @@ app.post('/api/openpix/webhook', async (req, res) => {
 
     if (event === 'OPENPIX:CHARGE_COMPLETED' && correlationID) {
       // Extrair sessionId do correlationID (formato: agil-{sessionId})
-      const sessionId = correlationID.replace('agil-', '');
+      const parts = correlationID.split('-');
+const sessionId = parts[1];
 
       // Atualizar status no Supabase
       await supabase
