@@ -116,7 +116,9 @@ app.post('/api/create-charge', async (req, res) => {
     const charge = data?.charge || data;
 
     // Salvar charge no Supabase
-    await supabase.from('agil_payments').upsert({
+    const { error: paymentError } = await supabase
+    .from('agil_payments')
+    .upsert({
       session_id: sessionId,
       correlation_id: correlationID,
       service_type: serviceType,
@@ -126,6 +128,14 @@ app.post('/api/create-charge', async (req, res) => {
       qr_code_image: charge?.qrCodeImage || '',
       created_at: new Date().toISOString(),
     }, { onConflict: 'session_id' });
+  
+  if (paymentError) {
+    console.error('❌ ERRO AO SALVAR PAYMENT:', paymentError);
+    return res.status(500).json({ error: 'Erro ao salvar pagamento' });
+  }
+  
+  console.log('✅ Payment salvo com sucesso:', correlationID);
+
 
     // Atualizar status da sessão
     await supabase
