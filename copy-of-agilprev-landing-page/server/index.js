@@ -114,7 +114,19 @@ app.post('/api/create-charge', async (req, res) => {
     });
 
     const charge = data?.charge || data;
-
+    const { error: sessionSaveError } = await supabase
+    .from('agil_sessions')
+    .upsert({
+      id: sessionId,
+      service_type: serviceType,
+      status: 'pending_payment',
+      updated_at: new Date().toISOString()
+    });
+  
+  if (sessionSaveError) {
+    console.error('❌ ERRO AO SALVAR SESSION:', sessionSaveError);
+    return res.status(500).json({ error: 'Erro ao salvar sessão' });
+  }
     // Salvar charge no Supabase
     const { error: paymentError } = await supabase
     .from('agil_payments')
@@ -136,7 +148,9 @@ app.post('/api/create-charge', async (req, res) => {
   
   console.log('✅ Payment salvo com sucesso:', correlationID);
 
+// 🔥 GARANTIR QUE A SESSION EXISTE ANTES DO PAGAMENTO
 
+  
     // Atualizar status da sessão
     await supabase
       .from('agil_sessions')
