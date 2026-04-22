@@ -116,12 +116,12 @@ app.post('/api/create-charge', async (req, res) => {
     const charge = data?.charge || data;
     const { error: sessionSaveError } = await supabase
   .from('agil_sessions')
-  .update({
+  .upsert({
+    id: sessionId,
     service_type: serviceType,
     status: 'pending_payment',
     updated_at: new Date().toISOString()
-  })
-  .eq('id', sessionId);
+  }, { onConflict: 'id' });
   
   if (sessionSaveError) {
     console.error('❌ ERRO AO SALVAR SESSION:', sessionSaveError);
