@@ -17,18 +17,18 @@ const AgilCheck = () => (
 
 const Hero: React.FC<HeroProps> = ({ onOpenModal, onStartChat }) => {
   return (
-    <section className="bg-agil-blue pt-16 pb-24 relative overflow-hidden px-4">
+    <section className="bg-agil-blue pt-16 pb-24 relative overflow-hidden px-6 sm:px-8 lg:px-10">
       <div className="max-w-6xl mx-auto relative z-10">
 
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
           {/* ── Coluna esquerda: copy ── */}
-          <div className="text-center lg:text-left">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-extrabold text-white leading-[1.1] mb-6 tracking-tight">
+          <div className="text-center lg:text-left mx-auto max-w-xl">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-extrabold text-white leading-[1.1] mb-6 tracking-tight max-w-[22ch] mx-auto lg:mx-0">
               A <span className="text-agil-yellow">Inteligência Artificial</span> que ajuda a resolver seu problema com o INSS!
             </h1>
 
-            <p className="text-blue-100 text-lg md:text-xl lg:text-2xl font-medium mb-8 leading-relaxed">
+            <p className="text-blue-100 text-lg md:text-xl lg:text-2xl font-medium mb-8 leading-relaxed max-w-md mx-auto lg:mx-0">
               É rápido, prático e em minutos emitimos uma saída para o seu caso.
             </p>
 
