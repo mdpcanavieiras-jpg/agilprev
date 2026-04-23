@@ -30,7 +30,7 @@ const PricingSelection: React.FC<PricingSelectionProps> = ({ onSelect }) => {
         <div className="flex flex-col md:flex-row justify-center items-stretch gap-8 max-w-5xl mx-auto">
           
           {/* Plan 1: Documento Básico */}
-          <div className="flex-1 flex flex-col bg-white rounded-[2.5rem] border border-gray-100 p-8 md:p-10 shadow-[0_45px_90px_-20px_rgba(0,0,0,0.1)] hover:shadow-[0_60px_120px_-25px_rgba(0,0,0,0.15)] hover:-translate-y-2 transition-all duration-500 group reveal">
+          <div className="flex-1 flex flex-col bg-white rounded-[2.5rem] border-2 border-agil-blue p-8 md:p-10 shadow-[0_45px_90px_-20px_rgba(0,0,0,0.1)] hover:shadow-[0_60px_120px_-25px_rgba(0,0,0,0.15)] hover:-translate-y-2 transition-all duration-500 group reveal">
             <div className="mb-8">
               <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3 tracking-tight group-hover:text-agil-blue transition-colors">Documento Básico</h3>
               <p className="text-base md:text-lg text-slate-500 font-medium leading-snug">Execução operacional. Documento padrão para protocolo no INSS ou CRPS. Não realiza avaliação do caso.</p>

@@ -75,7 +75,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({ isOpen, onClose, onSele
               style={{ background: '#f8fafc' }}
               onClick={() => onSelect('documento')}
             >
-              <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="flex items-start gap-3 mb-3">
                 <div>
                   <p className="font-black text-slate-900 text-[15px] leading-tight">
                     Documento Previdenciário
@@ -84,10 +84,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({ isOpen, onClose, onSele
                     Para quem já sabe o que precisa.
                   </p>
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="text-[10px] text-slate-400 font-semibold leading-none mb-0.5">por</p>
-                  <p className="text-[22px] font-black text-agil-blue leading-none">R$ 29</p>
-                </div>
+                
               </div>
 
               <ul className="space-y-2 mb-4">
@@ -130,7 +127,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({ isOpen, onClose, onSele
                 <Star size={9} fill="currentColor" /> Mais completo
               </span>
 
-              <div className="flex items-start justify-between gap-3 mb-3 pt-1">
+              <div className="flex items-start gap-3 mb-3 pt-1">
                 <div>
                   <p className="font-black text-slate-900 text-[15px] leading-tight">
                     Documento + Análise Inteligente
@@ -139,10 +136,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({ isOpen, onClose, onSele
                     Para quem quer segurança antes de protocolar.
                   </p>
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="text-[10px] text-slate-400 font-semibold leading-none mb-0.5">por</p>
-                  <p className="text-[22px] font-black leading-none" style={{ color: '#16a34a' }}>R$ 59</p>
-                </div>
+                
               </div>
 
               <ul className="space-y-2 mb-4">
