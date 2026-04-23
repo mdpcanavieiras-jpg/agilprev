@@ -37,10 +37,7 @@ const PricingSelection: React.FC<PricingSelectionProps> = ({ onSelect }) => {
             </div>
             
             <div className="pt-6 border-t border-slate-50 mb-8">
-              <div className="flex items-baseline gap-2">
-                <span className="text-4xl md:text-5xl font-black text-agil-blue tracking-tighter">R$ 29,00</span>
-              </div>
-              <span className="text-xs font-bold text-slate-400 mt-1 block uppercase tracking-wider">Pagamento único</span>
+              
             </div>
 
             <div className="flex-grow flex flex-col justify-start">
@@ -88,10 +85,7 @@ const PricingSelection: React.FC<PricingSelectionProps> = ({ onSelect }) => {
             </div>
             
             <div className="pt-6 border-t border-agil-green/10 mb-8">
-              <div className="flex items-baseline gap-2">
-                <span className="text-4xl md:text-5xl font-black text-agil-green tracking-tighter">R$ 59,00</span>
-              </div>
-              <span className="text-xs font-bold text-agil-green/60 mt-1 block uppercase tracking-wider">Pagamento único</span>
+              
             </div>
 
             <div className="flex-grow flex flex-col justify-start">
