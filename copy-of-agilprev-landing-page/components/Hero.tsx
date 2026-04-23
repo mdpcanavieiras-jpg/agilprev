@@ -24,7 +24,7 @@ const Hero: React.FC<HeroProps> = ({ onOpenModal, onStartChat }) => {
 
           {/* ── Coluna esquerda: copy ── */}
           <div className="text-center lg:text-left mx-auto max-w-xl">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-extrabold text-white leading-[1.1] mb-6 tracking-tight max-w-[22ch] mx-auto lg:mx-0">
+          <h1 className="text-[2.4rem] sm:text-4xl md:text-5xl lg:text-5xl font-extrabold text-white leading-[1.1] mb-6 tracking-tight max-w-[22ch] mx-auto lg:mx-0">
               A <span className="text-agil-yellow">Inteligência Artificial</span> que ajuda a resolver seu problema com o INSS!
             </h1>
 
