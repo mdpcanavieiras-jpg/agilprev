@@ -20,9 +20,14 @@ const supabase = createClient(
 
 // ─── Middlewares ─────────────────────────────────────────────────
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001', process.env.FRONTEND_URL].filter(Boolean),
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://agilprev.com.br'
+  ],
   credentials: true,
 }));
+app.options('*', cors());
 app.use(express.json());
 
 // ─── OpenPix Config ──────────────────────────────────────────────
