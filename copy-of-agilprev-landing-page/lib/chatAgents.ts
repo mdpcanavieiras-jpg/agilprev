@@ -442,20 +442,17 @@ export async function sendToAgent(
   const systemPrompt = serviceType === 'premium' ? PROMPT_PREMIUM : PROMPT_DOCUMENTO_BASICO;
 
   try {
-    const res = await fetch(OPENAI_API_URL, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        serviceType,
         messages: [
           { role: 'system', content: systemPrompt },
           ...history,
         ],
-        temperature: 0.6,
-        max_tokens: 2500, // suficiente para gerar o documento preliminar no chat
       }),
     });
 
