@@ -411,9 +411,7 @@ app.post('/api/chat', async (req, res) => {
 });
 
 // 👇 ISSO JÁ EXISTE (não mexe)
-app.listen(PORT, () => {
-  console.log(`🚀 Agilprev Server rodando em http://localhost:${PORT}`);
-});
+
 app.listen(PORT, () => {
   console.log(`\n🚀 Agilprev Server rodando em http://localhost:${PORT}`);
   console.log(`   OpenPix App ID: ${OPENPIX_APP_ID ? '✅ configurado' : '❌ faltando'}`);
