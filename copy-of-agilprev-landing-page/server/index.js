@@ -409,7 +409,12 @@ app.post('/api/chat', async (req, res) => {
 
     const data = await response.json();
 
-    res.json(data);
+const message = data?.choices?.[0]?.message?.content;
+
+res.json({
+  success: true,
+  message: message || 'Erro ao gerar resposta'
+});
   } catch (error) {
     console.error('Erro /api/chat:', error);
     res.status(500).json({ error: 'Erro no servidor' });

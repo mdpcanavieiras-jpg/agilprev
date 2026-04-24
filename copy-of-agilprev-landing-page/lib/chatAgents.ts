@@ -461,8 +461,8 @@ export async function sendToAgent(
       throw new Error((err as { error?: { message?: string } })?.error?.message || `Erro ${res.status}`);
     }
 
-    const data = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-    const raw = data.choices?.[0]?.message?.content?.trim() || '';
+    const data = (await res.json()) as { success: boolean; message?: string; error?: string };
+    const raw = data.message?.trim() || '';
     const documentReady = raw.includes('[[DOCUMENTO_PRONTO]]');
     const { options, cleanMessage } = extractQuickReplies(raw);
     const message = cleanMessage.replace('[[DOCUMENTO_PRONTO]]', '').trim();
