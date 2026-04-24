@@ -6,6 +6,7 @@ const { createClient } = require('@supabase/supabase-js');
 const { v4: uuidv4 } = require('uuid');
 const { Resend } = require('resend');
 
+
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const app = express();
@@ -386,7 +387,7 @@ app.get('/api/health', (_, res) => {
 
 app.post('/api/chat', async (req, res) => {
   try {
-    const { messages, serviceType } = req.body;
+    const { messages } = req.body;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -409,6 +410,8 @@ app.post('/api/chat', async (req, res) => {
     res.status(500).json({ error: 'Erro no servidor' });
   }
 });
+
+
 
 // 👇 ISSO JÁ EXISTE (não mexe)
 
