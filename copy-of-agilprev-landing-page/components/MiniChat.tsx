@@ -2,25 +2,26 @@ import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 
 interface MiniChatProps {
-  onStartChat: (type: 'documento' | 'premium') => void;
+  onStartChat: (type: 'hero' | 'documento' | 'premium') => void;
 }
 
 const MiniChat: React.FC<MiniChatProps> = ({ onStartChat }) => {
   const [texto, setTexto] = useState('');
 
-  const irParaChat = (type: 'documento' | 'premium') => {
+  const irParaChat = () => {
     if (texto.trim()) {
       localStorage.setItem('agil_initial_context', texto.trim());
     } else {
       localStorage.removeItem('agil_initial_context');
     }
-    onStartChat(type);
+
+    onStartChat('hero');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      irParaChat('documento');
+      irParaChat();
     }
   };
 
@@ -49,7 +50,7 @@ const MiniChat: React.FC<MiniChatProps> = ({ onStartChat }) => {
 
           <div className="space-y-2">
             <button
-              onClick={() => irParaChat('documento')}
+              onClick={irParaChat}
               className="w-full bg-agil-blue text-white font-black py-3.5 rounded-2xl text-[14px] flex items-center justify-center gap-2 hover:bg-blue-700 transition-all active:scale-95"
               style={{ boxShadow: '0 8px 20px -4px rgba(37,99,235,0.4)' }}
             >
@@ -58,7 +59,7 @@ const MiniChat: React.FC<MiniChatProps> = ({ onStartChat }) => {
             </button>
 
             <button
-              onClick={() => irParaChat('premium')}
+              onClick={irParaChat}
               className="w-full border-2 border-slate-200 text-slate-600 font-semibold py-3 rounded-2xl text-[13px] hover:border-agil-green hover:text-agil-green transition-all active:scale-95"
             >
               Prefiro conversar com calma e entender meus direitos

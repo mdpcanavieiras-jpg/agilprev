@@ -3,7 +3,7 @@ import { ArrowLeft, Send, Loader2, Sparkles, User, FileText, Shield, Clock, Chec
 import { sendToAgent, getOpeningMessage, Message } from '../lib/chatAgents';
 
 interface ChatPageProps {
-  serviceType: 'documento' | 'premium';
+  serviceType: 'hero' | 'documento' | 'premium';
   onBack: () => void;
   onFinish: () => void;
 }

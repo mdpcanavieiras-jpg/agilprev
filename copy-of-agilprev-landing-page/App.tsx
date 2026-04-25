@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import jsPDF from 'jspdf';
 import Header from './components/Header';
 import Hero from './components/Hero';
+import MiniChat from './components/MiniChat';
 import VideoExplanation from './components/VideoExplanation';
 import Stats from './components/Stats';
 import Solutions from './components/Solutions';
@@ -29,7 +30,7 @@ type View = 'landing' | 'chat' | 'generating' | 'preview' | 'done';
 const App: React.FC = () => {
   const [currentView, setCurrentView]     = useState<View>('landing');
   const [isModalOpen, setIsModalOpen]     = useState(false);
-  const [selectedService, setSelectedService] = useState<'documento' | 'premium'>('documento');
+  const [selectedService, setSelectedService] = useState<'hero' | 'documento' | 'premium'>('hero');
   const [generatedDoc, setGeneratedDoc]   = useState<string>('');
 
 
@@ -131,6 +132,22 @@ const App: React.FC = () => {
       />
     );
   }
+  return (
+    <>
+      {currentView === 'landing' && (
+        <>
+          <Hero />
+  
+          <MiniChat
+            onStartChat={(type) => {
+              setSelectedService(type);
+              setCurrentView('chat');
+            }}
+          />
+        </>
+      )}
+    </>
+  );
 
   // Geração do documento (loading + chamada real à OpenAI)
   if (currentView === 'generating') {
