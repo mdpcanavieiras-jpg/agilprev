@@ -135,17 +135,34 @@ const App: React.FC = () => {
   return (
     <>
       {currentView === 'landing' && (
-        <>
-      <Hero
-  onOpenModal={() => {}}
-  onStartChat={(type) => {
-    setSelectedService(type);
-    setCurrentView('chat');
-  }}
-/>
-  
-        </>
-      )}
+  <>
+    <Hero
+      onOpenModal={() => {}}
+      onStartChat={(type) => {
+        setSelectedService(type);
+        setCurrentView('chat');
+      }}
+    />
+
+    <VideoExplanation />
+    <Stats />
+    <Solutions />
+    <Benefits />
+    <DocumentPreview />
+    <PricingSelection
+      onSelect={(type) => {
+        setSelectedService(type);
+        setCurrentView('chat');
+      }}
+    />
+    <HowWeHelp />
+    <WorkflowSteps />
+    <FAQ />
+    <Testimonials />
+    <LearnMore />
+    <Footer />
+  </>
+)}
     </>
   );
 
