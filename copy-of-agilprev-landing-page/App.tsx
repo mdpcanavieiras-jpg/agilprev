@@ -136,14 +136,14 @@ const App: React.FC = () => {
     <>
       {currentView === 'landing' && (
         <>
-          <Hero />
+      <Hero
+  onOpenModal={() => {}}
+  onStartChat={(type) => {
+    setSelectedService(type);
+    setCurrentView('chat');
+  }}
+/>
   
-          <MiniChat
-            onStartChat={(type) => {
-              setSelectedService(type);
-              setCurrentView('chat');
-            }}
-          />
         </>
       )}
     </>

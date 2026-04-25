@@ -2,9 +2,11 @@ import React from 'react';
 import { Check, MessageSquare } from 'lucide-react';
 import MiniChat from './MiniChat';
 
+
+
 interface HeroProps {
   onOpenModal: () => void;
-  onStartChat: (type: 'documento' | 'premium') => void;
+  onStartChat: (type: 'hero' | 'documento' | 'premium') => void;
 }
 
 const AgilCheck = () => (
