@@ -46,7 +46,7 @@ const App: React.FC = () => {
   const openModal  = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  const startChat = (type: 'documento' | 'premium') => {
+  const startChat = (type: 'hero' | 'documento' | 'premium') => {
     setSelectedService(type);
     setIsModalOpen(false);
     setGeneratedDoc('');
@@ -123,73 +123,43 @@ const App: React.FC = () => {
   }, [currentView]);
 
   // ── Views ─────────────────────────────────────────────────────
-  if (currentView === 'chat') {
-    return (
-      <ChatPage
-        serviceType={selectedService}
-        onBack={goToLanding}
-        onFinish={goToGenerating}   // ← agora vai gerar antes do preview
-      />
-    );
-  }
+  // CHAT
+if (currentView === 'chat') {
   return (
-    <>
-      {currentView === 'landing' && (
-  <>
-    <Hero
-      onOpenModal={() => {}}
-      onStartChat={(type) => {
-        setSelectedService(type);
-        setCurrentView('chat');
-      }}
+    <ChatPage
+      serviceType={selectedService}
+      onBack={goToLanding}
+      onFinish={goToGenerating}
     />
-
-    <VideoExplanation />
-    <Stats />
-    <Solutions />
-    <Benefits />
-    <DocumentPreview />
-    <PricingSelection
-      onSelect={(type) => {
-        setSelectedService(type);
-        setCurrentView('chat');
-      }}
-    />
-    <HowWeHelp />
-    <WorkflowSteps />
-    <FAQ />
-    <Testimonials />
-    <LearnMore />
-    <Footer />
-  </>
-)}
-    </>
   );
+}
 
-  // Geração do documento (loading + chamada real à OpenAI)
-  if (currentView === 'generating') {
-    return (
-      <GenerateDocumentPage
-        serviceType={selectedService}
-        onBack={() => setCurrentView('chat')}
-        onNewConsultation={goToLanding}
-        onDocumentReady={onDocumentReady}   // ← transição automática para preview
-      />
-    );
-  }
+// GENERATING
+if (currentView === 'generating') {
+  return (
+    <GenerateDocumentPage
+      serviceType={selectedService}
+      onBack={() => setCurrentView('chat')}
+      onNewConsultation={goToLanding}
+      onDocumentReady={onDocumentReady}
+    />
+  );
+}
 
-  // ── Tela de conclusão após download ──────────────────────────
-  if (currentView === 'done') {
-    return (
-      <DonePage
-        serviceType={selectedService}
-        generatedDoc={generatedDoc}
-        onNewConsultation={goToLanding}
-        onDownloadAgain={() => buildAndDownloadPDF(generatedDoc, selectedService)}
-        onSendEmail={sendDocumentByEmail}
-      />
-    );
-  }
+// DONE
+if (currentView === 'done') {
+  return (
+    <DonePage
+      serviceType={selectedService}
+      generatedDoc={generatedDoc}
+      onNewConsultation={goToLanding}
+      onDownloadAgain={() =>
+        buildAndDownloadPDF(generatedDoc, selectedService)
+      }
+      onSendEmail={sendDocumentByEmail}
+    />
+  );
+}
 
   // Preview parcial + paywall → pagamento → download
   if (currentView === 'preview') {
@@ -234,7 +204,7 @@ const App: React.FC = () => {
 const LOGO_URL = 'https://horizons-cdn.hostinger.com/195324a5-5ad8-4c91-83fb-8e15c14e8dfe/94ac8ec0e4dff84bff0c6eccb37a8b58.png';
 
 interface DonePageProps {
-  serviceType: 'documento' | 'premium';
+  serviceType: 'hero' | 'documento' | 'premium';
   generatedDoc: string;
   onNewConsultation: () => void;
   onDownloadAgain: () => void;
