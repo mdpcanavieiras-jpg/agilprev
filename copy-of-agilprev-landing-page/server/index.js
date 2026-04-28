@@ -413,6 +413,7 @@ const message = data?.choices?.[0]?.message?.content;
 
 res.json({
   success: true,
+  message: message || 'Erro ao gerar resposta',
   content: message || 'Erro ao gerar resposta'
 });
   } catch (error) {
