@@ -35,9 +35,7 @@ const MiniChat: React.FC<MiniChatProps> = ({ onStartChat }) => {
           <p className="text-[15px] font-black text-slate-800 mb-1 leading-snug">
             Me conta o que está acontecendo
           </p>
-          <p className="text-[12px] text-slate-400 mb-4">
-            Descreva sua situação com o INSS — responderemos em minutos.
-          </p>
+         
 
           <textarea
             value={texto}
@@ -58,12 +56,7 @@ const MiniChat: React.FC<MiniChatProps> = ({ onStartChat }) => {
               <ArrowRight size={16} />
             </button>
 
-            <button
-              onClick={irParaChat}
-              className="w-full border-2 border-slate-200 text-slate-600 font-semibold py-3 rounded-2xl text-[13px] hover:border-agil-green hover:text-agil-green transition-all active:scale-95"
-            >
-              Prefiro conversar com calma e entender meus direitos
-            </button>
+            
           </div>
         </div>
 
