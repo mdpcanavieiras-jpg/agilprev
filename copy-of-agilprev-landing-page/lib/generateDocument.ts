@@ -1,7 +1,6 @@
 import { DOCUMENT_KNOWLEDGE_BASE, ADDITIONAL_CONTEXT, PREMIUM_ANALYSIS_TEMPLATE } from './documentKnowledgeBase';
 
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
-const API_KEY = import.meta.env.VITE_OPENAI_API_KEY as string;
+const API_URL = import.meta.env.VITE_API_URL;
   
 
 export interface ConversationMessage {
@@ -42,9 +41,9 @@ Com base na conversa acima e na base de conhecimento, gere o documento jurídico
 Gere o documento COMPLETO agora:`;
 
   try {
-    const res = await fetch(OPENAI_API_URL, {
+    const res = await fetch(`${API_URL}/api/chat`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'gpt-4o',
         messages: [{ role: 'user', content: prompt }],
@@ -93,9 +92,9 @@ Com base em tudo acima:
 Gere o documento COMPLETO E MELHORADO agora:`;
 
   try {
-    const res = await fetch(OPENAI_API_URL, {
+    const res = await fetch(`${API_URL}/api/chat`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'gpt-4o',
         messages: [{ role: 'user', content: prompt }],
