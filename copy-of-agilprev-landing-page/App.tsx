@@ -127,10 +127,11 @@ const App: React.FC = () => {
 if (currentView === 'chat') {
   return (
     <ChatPage
-      serviceType={selectedService}
-      onBack={goToLanding}
-      onFinish={goToGenerating}
-    />
+  serviceType={selectedService}
+  setSelectedService={setSelectedService}
+  onBack={goToLanding}
+  onFinish={goToGenerating}
+/>
   );
 }
 

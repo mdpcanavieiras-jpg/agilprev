@@ -4,6 +4,7 @@ import { sendToAgent, getOpeningMessage, Message } from '../lib/chatAgents';
 
 interface ChatPageProps {
   serviceType: 'hero' | 'documento' | 'premium';
+  setSelectedService: (type: 'documento' | 'premium') => void;
   onBack: () => void;
   onFinish: () => void;
 }
@@ -108,7 +109,7 @@ const SidePanel: React.FC<{ isPremium: boolean }> = ({ isPremium }) => {
 };
 
 // ─── Componente principal ─────────────────────────────────────────────────────
-const ChatPage: React.FC<ChatPageProps> = ({ serviceType, onBack, onFinish }) => {
+const ChatPage: React.FC<ChatPageProps> = ({ serviceType, setSelectedService, onBack, onFinish }) => {
   const isPremium = serviceType === 'premium';
   const accent    = isPremium ? '#22c55e' : '#2563eb';
   const accentDark = isPremium ? '#16a34a' : '#1d4ed8';
@@ -249,11 +250,13 @@ const ChatPage: React.FC<ChatPageProps> = ({ serviceType, onBack, onFinish }) =>
     setQuickReplies(null);
   
     if (option === 'Gerar Documento') {
+      setSelectedService('documento');
       handleSend('Quero gerar o documento previdenciário.');
       return;
     }
   
     if (option === 'Documento + Análise Inteligente') {
+      setSelectedService('premium');
       handleSend('Quero seguir com Documento + Análise Inteligente.');
       return;
     }
