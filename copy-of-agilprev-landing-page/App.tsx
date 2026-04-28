@@ -177,20 +177,22 @@ if (currentView === 'done') {
 
   // ── Landing ───────────────────────────────────────────────────
   return (
-    <div className="min-h-screen flex flex-col">
+    <div id="topo" className="min-h-screen flex flex-col">
       <Header onOpenModal={openModal} />
       <main className="flex-grow">
-        <Hero onOpenModal={openModal} onStartChat={startChat} />
+        <div className="scroll-mt-32">
+          <Hero onOpenModal={openModal} onStartChat={startChat} />
+        </div>
         <div className="reveal"><VideoExplanation /></div>
         <div className="reveal"><Stats /></div>
-        <div className="reveal"><Solutions /></div>
+        <div id="servicos" className="reveal scroll-mt-32"><Solutions /></div>
         <div className="reveal"><Benefits /></div>
         <div className="reveal"><DocumentPreview /></div>
-        <div className="reveal"><PricingSelection onSelect={startChat} /></div>
+        <div id="precos" className="reveal scroll-mt-32"><PricingSelection onSelect={startChat} /></div>
         <div className="reveal"><HowWeHelp /></div>
-        <div className="reveal"><WorkflowSteps /></div>
-        <div className="reveal"><FAQ /></div>
-        <div className="reveal"><Testimonials /></div>
+        <div id="como-funciona" className="reveal scroll-mt-32"><WorkflowSteps /></div>
+        <div id="faq" className="reveal scroll-mt-32"><FAQ /></div>
+        <div id="sobre" className="reveal scroll-mt-32"><Testimonials /></div>
         <div className="reveal"><LearnMore /></div>
       </main>
       <Footer />

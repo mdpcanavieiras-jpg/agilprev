@@ -22,21 +22,34 @@ const Header: React.FC<HeaderProps> = ({ onOpenModal }) => {
   }, [isMenuOpen]);
 
   const navLinks = [
-    { name: 'Serviços', href: '#' },
-    { name: 'Como Funciona', href: '#' },
-    { name: 'Preços', href: '#' },
-    { name: 'Sobre Nós', href: '#' },
-    { name: 'FAQ', href: '#' },
+    { name: 'Serviços', href: '#servicos' },
+    { name: 'Como Funciona', href: '#como-funciona' },
+    { name: 'Preços', href: '#precos' },
+    { name: 'Sobre Nós', href: '#sobre' },
+    { name: 'FAQ', href: '#faq' },
   ];
 
   const LOGO_URL = "https://horizons-cdn.hostinger.com/195324a5-5ad8-4c91-83fb-8e15c14e8dfe/94ac8ec0e4dff84bff0c6eccb37a8b58.png";
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (!href.startsWith('#')) return;
+    e.preventDefault();
+    setIsMenuOpen(false);
+    const el = document.querySelector(href);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.history.replaceState(null, '', href);
+  };
 
   return (
     <header className="bg-white py-3 border-b border-gray-100 sticky top-0 z-[100] shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         {/* Logo - Aumentada em 100% em relação à versão anterior */}
         <div className="flex items-center">
-          <a href="/" className="transition-all hover:opacity-90 active:scale-95 flex items-center">
+          <a
+            href="#topo"
+            onClick={(e) => handleNavClick(e, '#topo')}
+            className="transition-all hover:opacity-90 active:scale-95 flex items-center"
+          >
             <img 
               src={LOGO_URL} 
               alt="Agilprev Logo" 
@@ -54,7 +67,8 @@ const Header: React.FC<HeaderProps> = ({ onOpenModal }) => {
           {navLinks.map((link) => (
             <a 
               key={link.name} 
-              href={link.href} 
+              href={link.href}
+              onClick={(e) => handleNavClick(e, link.href)}
               className="hover:text-agil-blue transition-colors relative group"
             >
               {link.name}
@@ -96,7 +110,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenModal }) => {
               <a 
                 key={link.name}
                 href={link.href}
-                onClick={() => setIsMenuOpen(false)}
+                onClick={(e) => handleNavClick(e, link.href)}
                 className={`text-3xl font-extrabold text-white flex items-center justify-between group transition-all duration-500 delay-${idx * 100} ${
                   isMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'
                 }`}
