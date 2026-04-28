@@ -183,6 +183,17 @@ const ChatPage: React.FC<ChatPageProps> = ({ serviceType, onBack, onFinish }) =>
     setLastFailedMessages(apiHistory);
     const result = await sendToAgent(apiHistory, serviceType);
 
+    // Detectar botões [[...]]
+const quickMatches = result.message?.match(/\[\[(.*?)\]\]/g);
+
+if (quickMatches) {
+  const options = quickMatches.map(opt =>
+    opt.replace('[[', '').replace(']]', '')
+  );
+
+  setQuickReplies(options);
+}
+
     setLoading(false);
     setLastSentAt(null);
 
@@ -197,7 +208,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ serviceType, onBack, onFinish }) =>
     setMessages(all);
     localStorage.setItem('agil_conversation_data', JSON.stringify(all.map(m => ({ role: m.role, content: m.content }))));
 
-    if (result.quickReplies?.length && !result.documentReady) setQuickReplies(result.quickReplies);
+    // if (result.quickReplies?.length && !result.documentReady) setQuickReplies(result.quickReplies);
     if (result.documentReady) {
       localStorage.setItem('agil_chat_document', JSON.stringify(result.message));
       localStorage.setItem('agil_service_type', serviceType);
