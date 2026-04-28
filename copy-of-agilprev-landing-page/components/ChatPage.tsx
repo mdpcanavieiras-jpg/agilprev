@@ -251,12 +251,28 @@ const ChatPage: React.FC<ChatPageProps> = ({ serviceType, setSelectedService, on
   
     if (option === 'Gerar Documento') {
       setSelectedService('documento');
+      setMessages([
+        {
+          id: 1,
+          role: 'assistant',
+          content: getOpeningMessage('documento'),
+          time: nowTime(),
+        },
+      ]);
       return;
     }
   
     if (option === 'Documento + Análise Inteligente') {
       setSelectedService('premium');
-return;
+      setMessages([
+        {
+          id: 1,
+          role: 'assistant',
+          content: getOpeningMessage('premium'),
+          time: nowTime(),
+        },
+      ]);
+      return;
     }
   
     handleSend(option);
