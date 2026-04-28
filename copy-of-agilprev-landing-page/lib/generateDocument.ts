@@ -52,8 +52,8 @@ Gere o documento COMPLETO agora:`;
       }),
     });
     if (!res.ok) throw new Error(`Erro ${res.status}`);
-    const data = await res.json() as { choices?: { message?: { content?: string } }[] };
-    const content = data.choices?.[0]?.message?.content?.trim() || '';
+    const data = await res.json() as { content?: string; message?: string; choices?: { message?: { content?: string } }[] };
+    const content = (data.content || data.message || '').trim();
     return { success: true, content };
   } catch (e) {
     return { success: false, content: '', error: (e as Error).message };
