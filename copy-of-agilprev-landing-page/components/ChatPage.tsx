@@ -184,15 +184,20 @@ const ChatPage: React.FC<ChatPageProps> = ({ serviceType, onBack, onFinish }) =>
     const result = await sendToAgent(apiHistory, serviceType);
 
     // Detectar botões [[...]]
-const quickMatches = result.message?.match(/\[\[(.*?)\]\]/g);
+    const quickMatches = result.message?.match(/\[\[.*?\]\]|\[\s*.*?\s*\]/g);
 
-if (quickMatches) {
-  const options = quickMatches.map(opt =>
-    opt.replace('[[', '').replace(']]', '')
-  );
-
-  setQuickReplies(options);
-}
+    if (quickMatches) {
+      const options = quickMatches
+        .map(opt => opt.replace(/\[|\]/g, '').trim())
+        .filter(opt =>
+          opt === 'Gerar Documento' ||
+          opt === 'Documento + Análise Inteligente'
+        );
+    
+      if (options.length > 0) {
+        setQuickReplies(options);
+      }
+    }
 
     setLoading(false);
     setLastSentAt(null);
@@ -203,7 +208,10 @@ if (quickMatches) {
     }
     setLastFailedMessages(null);
 
-    const botMsg: UIMessage = { id: updated.length + 1, role: 'assistant', content: result.message, time: nowTime() };
+    const botMsg: UIMessage = { id: updated.length + 1, role: 'assistant', content: result.message
+      ?.replace(/\[\[Gerar Documento\]\]|\[\s*Gerar Documento\s*\]/g, '')
+      ?.replace(/\[\[Documento \+ Análise Inteligente\]\]|\[\s*Documento \+ Análise Inteligente\s*\]/g, '')
+      ?.trim(), time: nowTime() };
     const all = [...updated, botMsg];
     setMessages(all);
     localStorage.setItem('agil_conversation_data', JSON.stringify(all.map(m => ({ role: m.role, content: m.content }))));
@@ -238,16 +246,18 @@ if (quickMatches) {
   };
 
   const handleQuickReply = (option: string) => {
-    const docOptions = ['Requerimento Administrativo','Recurso ao CRPS','Revisão Administrativa','Petição ao Juizado Federal','Mandado de Segurança','Recurso Administrativo','Ação de Cobrança'];
-    const isDoc = docOptions.some(d => option.toLowerCase().includes(d.toLowerCase()) || d.toLowerCase().includes(option.toLowerCase()));
-    if (isDoc) {
-      const h = messages.map(m => ({ role: m.role, content: m.content }));
-      h.push({ role: 'user', content: option });
-      localStorage.setItem('agil_conversation_data', JSON.stringify(h));
-      addToast('success', '✅ Documento selecionado!', 'Gerando seu documento...');
-      setTimeout(onFinish, 1000);
+    setQuickReplies(null);
+  
+    if (option === 'Gerar Documento') {
+      handleSend('Quero gerar o documento previdenciário.');
       return;
     }
+  
+    if (option === 'Documento + Análise Inteligente') {
+      handleSend('Quero seguir com Documento + Análise Inteligente.');
+      return;
+    }
+  
     handleSend(option);
   };
 
@@ -437,7 +447,7 @@ if (quickMatches) {
                     : '1fr',
                 }}
               >
-                {quickReplies.map((opt, i) => (
+                {quickReplies && quickReplies.map((opt, i) => (
                   <button
                     key={i}
                     onClick={() => handleQuickReply(opt)}
