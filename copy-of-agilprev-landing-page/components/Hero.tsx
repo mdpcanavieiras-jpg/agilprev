@@ -19,7 +19,7 @@ const AgilCheck = () => (
 
 const Hero: React.FC<HeroProps> = ({ onOpenModal, onStartChat }) => {
   return (
-    <section className="bg-agil-blue pt-16 pb-24 relative overflow-hidden px-6 sm:px-8 lg:px-10">
+    <section className="bg-agil-blue pt-16 pb-24 relative overflow-hidden px-4 sm:px-6 lg:px-10">
       <div className="max-w-6xl mx-auto relative z-10">
 
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -60,7 +60,7 @@ const Hero: React.FC<HeroProps> = ({ onOpenModal, onStartChat }) => {
             {/* Label acima do chat */}
             <div className="flex items-center gap-3 mb-4 justify-center lg:justify-start">
               <div className="flex-1 h-px bg-white/20 max-w-[60px]" />
-              <p className="text-white/70 text-xs font-bold uppercase tracking-[0.2em] whitespace-nowrap">
+              <p className="text-white/70 text-xs font-bold uppercase tracking-[0.2em] text-center leading-snug max-w-[26ch]">
                 Ou tire sua dúvida agora, de graça
               </p>
               <div className="flex-1 h-px bg-white/20 max-w-[60px]" />

@@ -286,7 +286,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ serviceType, setSelectedService, on
     <div className="flex flex-col" style={{ minHeight: '100dvh', background: '#f1f5f9' }}>
 
       {/* Toasts */}
-      <div className="fixed top-4 right-2 sm:right-4 z-[999] space-y-2 w-[calc(100vw-1rem)] sm:w-72 max-w-sm pointer-events-none">
+      <div className="fixed top-4 left-2 right-2 sm:left-auto sm:right-4 z-[999] space-y-2 w-auto sm:w-72 max-w-sm pointer-events-none">
         {toasts.map(t => (
           <div key={t.id} className={`rounded-xl px-4 py-3 shadow-xl text-white animate-fade-in pointer-events-auto ${t.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
             <p className="font-black text-sm leading-none">{t.title}</p>

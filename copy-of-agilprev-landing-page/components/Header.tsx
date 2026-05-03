@@ -41,7 +41,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenModal }) => {
   };
 
   return (
-    <header className="bg-white py-3 border-b border-gray-100 sticky top-0 z-[100] shadow-sm">
+    <header className="bg-white py-2 sm:py-3 border-b border-gray-100 sticky top-0 z-[100] shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         {/* Logo - Aumentada em 100% em relação à versão anterior */}
         <div className="flex items-center">
@@ -53,7 +53,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenModal }) => {
             <img 
               src={LOGO_URL} 
               alt="Agilprev Logo" 
-              className="h-[90px] md:h-[108px] w-auto object-contain transition-all duration-300" 
+              className="h-16 sm:h-[90px] md:h-[108px] w-auto object-contain transition-all duration-300" 
               style={{ 
                 imageRendering: 'auto',
                 filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.02))'

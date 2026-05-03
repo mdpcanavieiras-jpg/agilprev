@@ -179,7 +179,7 @@ if (currentView === 'done') {
   return (
     <div id="topo" className="min-h-screen flex flex-col">
       <Header onOpenModal={openModal} />
-      <main className="flex-grow">
+      <main className="flex-grow flex flex-col gap-10 sm:gap-14">
         <div className="scroll-mt-32">
           <Hero onOpenModal={openModal} onStartChat={startChat} />
         </div>

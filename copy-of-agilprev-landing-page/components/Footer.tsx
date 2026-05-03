@@ -74,7 +74,7 @@ const Footer: React.FC = () => {
                  <Lock size={16} className="text-[#0B1120]" fill="currentColor" />
                </div>
             </div>
-            <div className="bg-[#84CC16] h-[36px] px-6 flex flex-col justify-center rounded-r-lg -ml-1.5 border-y border-r border-[#BEF264]/20 shadow-lg min-w-[100px]">
+            <div className="bg-[#84CC16] h-[36px] px-6 flex flex-col justify-center rounded-r-lg ml-0 border-y border-r border-[#BEF264]/20 shadow-lg min-w-[100px]">
                <span className="text-[#0B1120] text-[10px] font-black tracking-[0.2em] leading-none mb-0.5">— SSL —</span>
                <span className="text-[#0B1120] text-[7px] font-bold tracking-[0.1em] opacity-80 uppercase">Certificate</span>
             </div>
@@ -93,7 +93,7 @@ const Footer: React.FC = () => {
           </div>
 
           <div className="flex items-center justify-center w-full group cursor-default">
-            <div className="relative shrink-0">
+            <div className="relative shrink-0 overflow-hidden">
                <svg width="42" height="49" viewBox="0 0 60 70" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_4px_10px_rgba(0,0,0,0.3)] transition-transform group-hover:scale-105">
                  <path d="M30 0L5 10V35C5 50.4 15.6 64.6 30 70C44.4 64.6 55 50.4 55 35V10L30 0Z" fill="#84CC16" />
                  <path d="M30 4L8 12.8V35C8 48.6 17.3 61.2 30 66C42.7 61.2 52 48.6 52 35V12.8L30 4Z" fill="#65A30D" />
@@ -101,7 +101,7 @@ const Footer: React.FC = () => {
                <div className="absolute inset-0 flex items-center justify-center -mt-0.5">
                  <ShoppingCart size={16} className="text-white" />
                </div>
-               <div className="absolute top-1/2 right-0 translate-x-1/3 -translate-y-1/2 w-4 h-4 bg-white rounded-full flex items-center justify-center border-2 border-[#84CC16] shadow-sm">
+               <div className="absolute top-1/2 right-1 -translate-y-1/2 w-4 h-4 bg-white rounded-full flex items-center justify-center border-2 border-[#84CC16] shadow-sm">
                   <CheckCircle2 size={9} className="text-[#84CC16]" />
                </div>
             </div>

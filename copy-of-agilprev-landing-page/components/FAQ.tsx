@@ -15,11 +15,12 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, isOpen, onClick, in
     <div className={`mb-6 border border-gray-100 rounded-[2.5rem] overflow-hidden transition-all duration-500 bg-white ${isOpen ? 'shadow-[0_30px_60px_-15px_rgba(37,99,235,0.15)] ring-1 ring-agil-blue/5' : 'shadow-[0_15px_30px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)] hover:-translate-y-1'}`}>
       <button
         onClick={onClick}
-        className="w-full px-8 py-7 flex items-center justify-between text-left focus:outline-none group"
+        className="w-full px-5 sm:px-8 py-5 sm:py-7 flex items-center justify-between text-left focus:outline-none group"
       >
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-3 sm:gap-5 min-w-0">
           <span className="text-agil-blue font-black text-sm opacity-20">{String(index + 1).padStart(2, '0')}</span>
-          <span className={`text-lg md:text-xl font-bold transition-colors duration-300 ${isOpen ? 'text-agil-blue' : 'text-gray-900 group-hover:text-agil-blue'}`}
+          <span
+          className={`text-base sm:text-lg md:text-xl font-bold transition-colors duration-300 min-w-0 ${isOpen ? 'text-agil-blue' : 'text-gray-900 group-hover:text-agil-blue'}`}
           dangerouslySetInnerHTML={{ __html: question }}
           />
         </div>
@@ -30,7 +31,8 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, isOpen, onClick, in
       <div 
         className={`transition-all duration-500 ease-in-out overflow-hidden ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
       >
-        <div className="px-10 pb-10 pt-2 text-gray-500 text-base md:text-lg leading-relaxed font-medium ml-10 border-t border-gray-50/50"
+        <div
+        className="px-5 sm:px-10 pb-8 sm:pb-10 pt-2 text-gray-500 text-sm sm:text-base md:text-lg leading-relaxed font-medium ml-0 sm:ml-10 border-t border-gray-50/50"
         dangerouslySetInnerHTML={{ __html: answer }}
         />
       </div>

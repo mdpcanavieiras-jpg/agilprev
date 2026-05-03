@@ -1,2 +1,18 @@
 /* Estilos globais adicionais — as principais custom classes estão no <style> do index.html */
 *, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Evita “estouro” horizontal em mídia/embeds no mobile */
+img, svg, video, canvas {
+  max-width: 100%;
+}
+
+/* Conteúdo longo (ex: links/códigos) não deve empurrar a página */
+pre, code {
+  max-width: 100%;
+  overflow-x: auto;
+}

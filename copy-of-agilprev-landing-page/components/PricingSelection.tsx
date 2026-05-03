@@ -74,7 +74,7 @@ const PricingSelection: React.FC<PricingSelectionProps> = ({ onSelect }) => {
 
           {/* Plan 2: Documento + Análise Inteligente Personalizada */}
           <div className="flex-1 flex flex-col bg-white rounded-[2.5rem] border-2 border-agil-green p-8 md:p-10 shadow-[0_50px_100px_-20px_rgba(15,70,30,0.15)] hover:shadow-[0_70px_140px_-30px_rgba(15,70,30,0.2)] relative z-10 hover:-translate-y-2 transition-all duration-500 group reveal delay-200">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-agil-green text-white text-[10px] font-black px-5 py-1.5 rounded-full uppercase tracking-[0.2em] shadow-lg shadow-green-500/20 flex items-center gap-2 whitespace-nowrap">
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-agil-green text-white text-[10px] font-black px-5 py-1.5 rounded-full uppercase tracking-[0.2em] shadow-lg shadow-green-500/20 flex items-center gap-2 text-center max-w-[90%]">
               <Star size={12} fill="currentColor" />
               Recomendado
             </div>
