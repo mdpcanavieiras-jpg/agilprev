@@ -1,4 +1,7 @@
+// Carrega .env em dev (vários caminhos) — no Railway as vars vêm do ambiente
 require('dotenv').config({ path: '../.env.local' });
+require('dotenv').config({ path: '.env.local' });
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
@@ -6,6 +9,11 @@ const { createClient } = require('@supabase/supabase-js');
 const { v4: uuidv4 } = require('uuid');
 const { Resend } = require('resend');
 
+const OpenAI = require('openai');
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -399,35 +407,56 @@ app.get('/api/health', (_, res) => {
 });
 // 👇 COLE AQUI (antes do app.listen)
 
+const OPENAI_CHAT_MODEL = process.env.OPENAI_CHAT_MODEL || 'gpt-4o';
+
 app.post('/api/chat', async (req, res) => {
+  const apiKey = process.env.OPENAI_API_KEY;
   try {
     const { messages } = req.body;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o',
-        messages,
-        temperature: 0.6,
-      }),
+    if (!apiKey || String(apiKey).trim() === '') {
+      console.error('[api/chat] OPENAI_API_KEY ausente ou vazio (verifique variáveis no Railway e .env.local em dev)');
+      return res.status(500).json({
+        success: false,
+        error: { message: 'OPENAI_API_KEY não configurada no servidor' },
+      });
+    }
+
+    if (!Array.isArray(messages) || messages.length === 0) {
+      console.error('[api/chat] Body inválido: messages deve ser array não vazio', {
+        hasMessages: !!req.body?.messages,
+      });
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Campo "messages" é obrigatório e deve ser um array' },
+      });
+    }
+
+    const completion = await openai.chat.completions.create({
+      model: OPENAI_CHAT_MODEL || 'gpt-4o-mini',
+      messages,
+      temperature: 0.6,
     });
+    
+    const content =
+  completion.choices?.[0]?.message?.content || 'Erro ao gerar resposta';
 
-    const data = await response.json();
-
-const message = data?.choices?.[0]?.message?.content;
-
-res.json({
+return res.json({
   success: true,
-  message: message || 'Erro ao gerar resposta',
-  content: message || 'Erro ao gerar resposta'
+  message: content,
+  content,
 });
+
   } catch (error) {
-    console.error('Erro /api/chat:', error);
-    res.status(500).json({ error: 'Erro no servidor' });
+    console.error('[api/chat] Exceção não tratada:', {
+      message: error?.message,
+      stack: error?.stack,
+      name: error?.name,
+    });
+    res.status(500).json({
+      success: false,
+      error: { message: error?.message || 'Erro no servidor' },
+    });
   }
 });
 
@@ -436,7 +465,11 @@ res.json({
 // 👇 ISSO JÁ EXISTE (não mexe)
 
 app.listen(PORT, () => {
+  const key = process.env.OPENAI_API_KEY;
+  const keyHint = key && key.length > 8 ? `${key.slice(0, 7)}…${key.slice(-4)}` : key ? '(curta)' : 'ausente';
   console.log(`\n🚀 Agilprev Server rodando em http://localhost:${PORT}`);
   console.log(`   OpenPix App ID: ${OPENPIX_APP_ID ? '✅ configurado' : '❌ faltando'}`);
-  console.log(`   Supabase URL:   ${process.env.VITE_SUPABASE_URL ? '✅ configurado' : '❌ faltando'}\n`);
+  console.log(`   Supabase URL:   ${process.env.VITE_SUPABASE_URL ? '✅ configurado' : '❌ faltando'}`);
+  console.log(`   OpenAI API key: ${key ? `✅ carregada (${keyHint})` : '❌ faltando'}`);
+  console.log(`   OpenAI model:   ${OPENAI_CHAT_MODEL}\n`);
 });
