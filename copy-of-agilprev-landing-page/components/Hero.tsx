@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, MessageSquare } from 'lucide-react';
+import { Check } from 'lucide-react';
 import MiniChat from './MiniChat';
 
 
@@ -17,7 +17,7 @@ const AgilCheck = () => (
   </div>
 );
 
-const Hero: React.FC<HeroProps> = ({ onOpenModal, onStartChat }) => {
+const Hero: React.FC<HeroProps> = ({ onOpenModal: _onOpenModal, onStartChat }) => {
   return (
     <section className="bg-agil-blue pt-16 pb-24 relative overflow-hidden px-4 sm:px-6 lg:px-10">
       <div className="max-w-6xl mx-auto relative z-10">
@@ -35,7 +35,7 @@ const Hero: React.FC<HeroProps> = ({ onOpenModal, onStartChat }) => {
             </p>
 
             {/* Checklist */}
-            <div className="flex flex-col gap-3 mb-8">
+            <div className="flex flex-col gap-3">
               {['Sem taxa de sucesso', 'Resultado em minutos', 'Atendimento 100% online'].map(item => (
                 <div key={item} className="flex items-center gap-3 justify-center lg:justify-start">
                   <AgilCheck />
@@ -43,16 +43,6 @@ const Hero: React.FC<HeroProps> = ({ onOpenModal, onStartChat }) => {
                 </div>
               ))}
             </div>
-
-            {/* CTA direto (para quem não quer usar o chat) */}
-            <button
-              type="button"
-              onClick={onOpenModal}
-              className="w-full sm:w-auto bg-agil-green text-white px-10 py-4 rounded-2xl font-black text-lg hover:bg-green-600 shadow-xl shadow-green-900/30 transition-all active:scale-95 animate-pulse-button flex items-center justify-center gap-3 mx-auto lg:mx-0"
-            >
-              <MessageSquare size={22} />
-              RESOLVER MEU CASO AGORA
-            </button>
           </div>
 
           {/* ── Coluna direita: mini-chat ── */}

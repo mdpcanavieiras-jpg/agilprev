@@ -24,10 +24,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({ isOpen, onClose, onSele
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center"
-      style={{ padding: '0' }}
-    >
+    <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
@@ -36,19 +33,16 @@ const SelectionModal: React.FC<SelectionModalProps> = ({ isOpen, onClose, onSele
 
       {/* Modal container */}
       <div
-        className="modal-card relative w-full sm:w-auto sm:min-w-[480px] sm:max-w-[520px] bg-white z-10 flex flex-col"
-        style={{ borderRadius: '24px 24px 0 0', maxHeight: '92dvh' }}
+        className="modal-card relative z-10 mx-auto flex w-full max-w-[360px] flex-col overflow-hidden rounded-3xl bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] sm:max-w-md max-h-[90vh]"
       >
-        {/* Handle bar (mobile) */}
-        <div className="flex justify-center pt-3 pb-1 sm:hidden">
-          <div className="w-10 h-1 rounded-full bg-slate-200" />
-        </div>
-
         {/* Scroll container */}
-        <div className="overflow-y-auto flex-1 min-h-0" style={{ borderRadius: 'inherit' }}>
+        <div
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]"
+          style={{ WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
+        >
 
           {/* Header */}
-          <div className="flex items-start justify-between px-5 pt-4 pb-4 sm:px-6 sm:pt-6">
+          <div className="flex items-start justify-between px-6 pt-6 pb-5 sm:px-8 sm:pt-8 sm:pb-6">
             <div>
               <p className="font-black text-slate-900 text-[17px] sm:text-lg leading-tight">
                 Como posso te ajudar?
@@ -60,18 +54,18 @@ const SelectionModal: React.FC<SelectionModalProps> = ({ isOpen, onClose, onSele
             <button
               onClick={onClose}
               aria-label="Fechar"
-              className="p-2 -mt-1 -mr-1 rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-all shrink-0"
+              className="shrink-0 rounded-xl p-2 text-slate-400 transition-all hover:bg-slate-100 hover:text-slate-700"
             >
               <X size={20} />
             </button>
           </div>
 
           {/* Cards */}
-          <div className="px-4 sm:px-6 space-y-3 pb-2">
+          <div className="space-y-4 px-5 pb-4 sm:space-y-3 sm:px-8">
 
             {/* ── Card Básico ── */}
             <div
-              className="rounded-2xl border-2 border-slate-100 p-4 sm:p-5 cursor-pointer transition-all active:scale-[0.99]"
+              className="rounded-2xl border-2 border-slate-100 p-5 cursor-pointer transition-all active:scale-[0.99]"
               style={{ background: '#f8fafc' }}
               onClick={() => onSelect('documento')}
             >
@@ -111,7 +105,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({ isOpen, onClose, onSele
 
             {/* ── Card Premium ── */}
             <div
-              className="rounded-2xl border-2 p-4 sm:p-5 cursor-pointer relative transition-all active:scale-[0.99]"
+              className="relative cursor-pointer rounded-2xl border-2 p-5 transition-all active:scale-[0.99]"
               style={{
                 borderColor: '#22c55e',
                 background: 'linear-gradient(135deg, #f0fdf4 0%, #ffffff 55%)',
@@ -165,7 +159,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({ isOpen, onClose, onSele
           </div>
 
           {/* Rodapé */}
-          <div className="flex flex-col items-center gap-3 px-5 py-4 sm:py-5">
+          <div className="flex flex-col items-center gap-3 border-t border-slate-100/80 px-6 py-6 sm:px-8">
             {/* Social proof */}
             <div className="flex items-center gap-2.5">
               <div className="flex -space-x-2">

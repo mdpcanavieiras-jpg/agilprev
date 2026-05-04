@@ -49,10 +49,9 @@ const MiniChat: React.FC<MiniChatProps> = ({ onStartChat }) => {
           <div className="space-y-2">
             <button
               onClick={irParaChat}
-              className="w-full bg-agil-blue text-white font-black py-3.5 rounded-2xl text-[14px] flex items-center justify-center gap-2 hover:bg-blue-700 transition-all active:scale-95"
-              style={{ boxShadow: '0 8px 20px -4px rgba(37,99,235,0.4)' }}
+              className="w-full bg-agil-green text-white font-black py-3.5 rounded-2xl text-[14px] flex items-center justify-center gap-2 hover:bg-green-600 transition-all active:scale-95 shadow-lg shadow-green-500/30"
             >
-              Iniciar atendimento
+              Resolver meu caso
               <ArrowRight size={16} />
             </button>
 
