@@ -19,14 +19,23 @@ const supabase = createClient(
 );
 
 // ─── Middlewares ─────────────────────────────────────────────────
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'https://agilprev.com.br',
+  'https://www.agilprev.com.br'
+];
+
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'https://agilprev.com.br'
-  ],
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
 }));
+
 app.options('*', cors());
 app.use(express.json());
 
