@@ -129,10 +129,17 @@ const ChatPage: React.FC<ChatPageProps> = ({ serviceType, setSelectedService, on
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef       = useRef<HTMLInputElement>(null);
 
-  const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-
-  useEffect(() => { scrollToBottom(); }, [messages, loading]);
-  useEffect(() => { if (!loading && !documentReady) inputRef.current?.focus(); }, [loading, documentReady]);
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+  useEffect(() => {
+    if (messages.length > 1) {
+      scrollToBottom();
+    }
+  }, [messages]);
+  
 
   // Contexto do MiniChat "Outro"
   useEffect(() => {

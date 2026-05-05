@@ -6,6 +6,11 @@ html, body {
   overflow-x: hidden;
 }
 
+/* PASSO 5 — impedir scroll do body apenas durante o chat */
+body.chat-open {
+  overflow: hidden;
+}
+
 /* Evita “estouro” horizontal em mídia/embeds no mobile */
 img, svg, video, canvas {
   max-width: 100%;
