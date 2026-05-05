@@ -813,7 +813,7 @@ export function getOpeningMessage(serviceType: 'hero' | 'documento' | 'premium')
     return 'Olá. Sou o Daniel, do Agilprev.\nVou conduzir seu atendimento de forma clara e estruturada, para que seu documento seja gerado com precisão.\n\nPara iniciar, preciso do seu nome completo, conforme consta nos seus documentos oficiais.';
   }
   if (serviceType === 'documento') {
-  return `Olá! Sou o Agilprev.
+  return `Olá! Sou o Agilprev 👍
 
   Vamos preparar seu documento do INSS.
   
