@@ -185,7 +185,14 @@ const ChatPage: React.FC<ChatPageProps> = ({ serviceType, setSelectedService, on
     const history = updated.map(m => ({ role: m.role, content: m.content }));
     localStorage.setItem('agil_conversation_data', JSON.stringify(history));
 
-    await new Promise(r => setTimeout(r, 800));
+    const typingDelay =
+  text.length < 20
+    ? 1500
+    : text.length < 80
+    ? 2500
+    : 4000;
+
+await new Promise(r => setTimeout(r, typingDelay));
 
     const apiHistory: Message[] = updated.map(m => ({ role: m.role, content: m.content }));
     setLastFailedMessages(apiHistory);
@@ -237,7 +244,14 @@ const ChatPage: React.FC<ChatPageProps> = ({ serviceType, setSelectedService, on
   const handleRetry = async () => {
     if (!lastFailedMessages) return;
     setLoading(true); setIsUnresponsive(false); setLastSentAt(Date.now());
-    await new Promise(r => setTimeout(r, 800));
+    const typingDelay =
+  text.length < 20
+    ? 1500
+    : text.length < 80
+    ? 2500
+    : 4000;
+
+await new Promise(r => setTimeout(r, typingDelay));
     const result = await sendToAgent(lastFailedMessages, serviceType);
     setLoading(false); setLastSentAt(null);
     if (!result.success) { addToast('error', 'Erro', result.error || 'Tente novamente.'); return; }
