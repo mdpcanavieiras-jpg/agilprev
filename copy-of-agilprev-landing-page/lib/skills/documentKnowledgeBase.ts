@@ -101,3 +101,58 @@ export const DOCUMENT_SKILLS = {
   `
     }
   };
+  export const PREMIUM_SKILLS = {
+    analiseInteligente: {
+      palavrasChave: [
+        'premium',
+        'análise',
+        'estratégia',
+        'urgente',
+        'risco',
+        'indeferido',
+        'negado',
+        'demora',
+        'parado',
+        'bpc',
+        'loas',
+        'aposentadoria',
+        'exigência',
+        'recurso'
+      ],
+  
+      orientacao: `
+  O Premium deve realizar análise estratégica do caso previdenciário.
+  
+  OBJETIVOS:
+  - reduzir erros administrativos;
+  - orientar próximos passos;
+  - classificar riscos;
+  - explicar situação atual;
+  - alinhar expectativas;
+  - orientar documentos importantes.
+  
+  CLASSIFICAÇÃO:
+  - caso simples;
+  - atenção moderada;
+  - caso sensível;
+  - caso crítico.
+  
+  O Premium deve:
+  - explicar riscos sem alarmismo;
+  - evitar promessas;
+  - usar linguagem humana;
+  - orientar de forma estratégica;
+  - explicar o que normalmente acontece no INSS;
+  - orientar documentos importantes;
+  - explicar erros comuns;
+  - explicar próximos passos seguros.
+  
+  O Premium NÃO deve:
+  - garantir benefício;
+  - prometer aprovação;
+  - substituir advogado;
+  - afirmar vitória judicial;
+  - criar conflito com o INSS.
+  `
+    }
+  };
