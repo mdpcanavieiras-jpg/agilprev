@@ -5,7 +5,7 @@
  * - Premium (coleta + aprofunda + gera preliminar no chat)
  * O documento final e profissional é gerado por generateDocument.ts
  */
-
+import { DOCUMENT_SKILLS } from './skills/documentKnowledgeBase';
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
 const API_KEY =
@@ -761,6 +761,32 @@ export async function sendToAgent(
       ? PROMPT_PREMIUM
       : PROMPT_DOCUMENTO_BASICO;
 
+const userText = history
+  .map(m => m.content)
+  .join(' ')
+  .toLowerCase();
+      
+    
+    let skillContext = '';
+    
+    Object.entries(DOCUMENT_SKILLS).forEach(([key, skill]) => {
+      const encontrou = skill.palavrasChave.some(p =>
+        userText.includes(p.toLowerCase())
+      );
+    
+      if (encontrou) {
+        skillContext += `
+    
+    TIPO DE CASO IDENTIFICADO: ${key}
+    
+    DOCUMENTO RECOMENDADO:
+    ${skill.tipoDocumento}
+    
+    PERGUNTAS IMPORTANTES:
+    ${skill.perguntasExtras.join('\n')}
+    `;
+      }
+    });
   try {
     const res = await fetch(`${import.meta.env.VITE_API_URL}/api/chat`, {
       method: 'POST',
@@ -770,7 +796,10 @@ export async function sendToAgent(
       body: JSON.stringify({
         serviceType,
         messages: [
-          { role: 'system', content: systemPrompt },
+          {
+            role: 'system',
+            content: systemPrompt + '\n\n' + skillContext
+          },
           ...history,
         ],
       }),
