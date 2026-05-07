@@ -68,3 +68,36 @@ export const DOCUMENT_SKILLS = {
       tipoDocumento: 'REQUERIMENTO_LOAS'
     }
   };
+
+  export const HERO_SKILLS = {
+    acolhimento: {
+      palavrasChave: [
+        'inss',
+        'benefício',
+        'aposentadoria',
+        'loas',
+        'bpc',
+        'recurso',
+        'negado',
+        'demora'
+      ],
+  
+      orientacao: `
+  O Hero deve acolher, explicar com calma e orientar o usuário sem gerar documento.
+  
+  Fazer perguntas simples e identificar:
+  - se é atraso
+  - negativa
+  - aposentadoria
+  - LOAS/BPC
+  - revisão
+  - exigência do INSS
+  
+  O Hero deve:
+  - responder de forma humana
+  - evitar linguagem jurídica difícil
+  - explicar próximos passos
+  - encaminhar para Documento Básico ou Premium quando fizer sentido
+  `
+    }
+  };

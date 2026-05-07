@@ -5,7 +5,10 @@
  * - Premium (coleta + aprofunda + gera preliminar no chat)
  * O documento final e profissional é gerado por generateDocument.ts
  */
-import { DOCUMENT_SKILLS } from './skills/documentKnowledgeBase';
+import {
+  DOCUMENT_SKILLS,
+  HERO_SKILLS
+} from './skills/documentKnowledgeBase';
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
 const API_KEY =
@@ -768,6 +771,7 @@ const userText = history
       
     
     let skillContext = '';
+    let heroContext = '';
     
     Object.entries(DOCUMENT_SKILLS).forEach(([key, skill]) => {
       const encontrou = skill.palavrasChave.some(p =>
@@ -787,6 +791,30 @@ const userText = history
     `;
       }
     });
+    if (serviceType === 'hero') {
+
+      Object.entries(HERO_SKILLS).forEach(([key, skill]) => {
+    
+        const encontrou = skill.palavrasChave.some(p =>
+          userText.includes(p.toLowerCase())
+        );
+    
+        if (encontrou) {
+    
+          heroContext += `
+    
+    CONTEXTO HERO:
+    ${key}
+    
+    ORIENTAÇÃO:
+    ${skill.orientacao}
+    `;
+    
+        }
+    
+      });
+    
+    }
   try {
     const res = await fetch(`${import.meta.env.VITE_API_URL}/api/chat`, {
       method: 'POST',
@@ -798,8 +826,12 @@ const userText = history
         messages: [
           {
             role: 'system',
-            content: systemPrompt + '\n\n' + skillContext
-          },
+            content:
+            systemPrompt +
+            '\n\n' +
+            skillContext +
+            '\n\n' +
+            heroContext          },
           ...history,
         ],
       }),
