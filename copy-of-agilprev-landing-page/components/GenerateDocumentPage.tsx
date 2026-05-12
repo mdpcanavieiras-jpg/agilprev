@@ -98,6 +98,7 @@ const GenerateDocumentPage: React.FC<GenerateDocumentPageProps> = ({
       }
 
     } catch (e) {
+      console.error('ERRO REAL AO GERAR DOCUMENTO:', e);
       setError((e as Error).message || 'Erro desconhecido.');
       setGenerating(false);
     }
