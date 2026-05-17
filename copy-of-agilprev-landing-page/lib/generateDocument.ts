@@ -114,7 +114,11 @@ try {
 
   console.log('DATA PREMIUM:', data);
 
-  const content = data.choices?.[0]?.message?.content?.trim() || '';
+  const content =
+  (data as any).content?.trim?.() ||
+  (data as any).message?.trim?.() ||
+  data.choices?.[0]?.message?.content?.trim() ||
+  '';
   return { success: true, content };
 } catch (e) {
   return { success: false, content: '', error: (e as Error).message };
