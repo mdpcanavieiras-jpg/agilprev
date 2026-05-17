@@ -20,6 +20,7 @@ import SelectionModal from './components/SelectionModal';
 import ChatPage from './components/ChatPage';
 import GenerateDocumentPage from './components/GenerateDocumentPage';
 import PreviewDocumentPage from './components/PreviewDocumentPage';
+import AdminPage from './components/AdminPage';
 
 // ──────────────────────────────────────────────────────────────────────
 // FLUXO CORRETO:
@@ -28,6 +29,9 @@ import PreviewDocumentPage from './components/PreviewDocumentPage';
 type View = 'landing' | 'chat' | 'generating' | 'preview' | 'done';
 
 const App: React.FC = () => {
+  if (window.location.pathname === '/admin') {
+    return <AdminPage />;
+  }
   const [currentView, setCurrentView]     = useState<View>('landing');
   const [isModalOpen, setIsModalOpen]     = useState(false);
   const [selectedService, setSelectedService] = useState<'hero' | 'documento' | 'premium'>('hero');
