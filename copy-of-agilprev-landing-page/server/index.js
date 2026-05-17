@@ -75,7 +75,18 @@ const LABELS = {
 // ════════════════════════════════════════════════════════════════
 app.post('/api/session', async (req, res) => {
   try {
-    const { sessionId, serviceType, conversationData, nome, email } = req.body;
+    const {
+      sessionId,
+      serviceType,
+      conversationData,
+      nome,
+      email,
+      tipo_beneficio,
+      problema_principal,
+      origem,
+      produto,
+      status_funil
+    } = req.body;
     const id = sessionId || uuidv4();
 
     const { error } = await supabase
@@ -86,6 +97,11 @@ app.post('/api/session', async (req, res) => {
         conversation_data: conversationData,
         nome,
         email,
+        produto: produto || serviceType,
+        tipo_beneficio: tipo_beneficio || null,
+        problema_principal: problema_principal || null,
+        origem: origem || 'site',
+        status_funil: status_funil || 'iniciado',
         status: 'chat',
         updated_at: new Date().toISOString(),
       }, { onConflict: 'id' });
