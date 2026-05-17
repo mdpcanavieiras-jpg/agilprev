@@ -422,7 +422,85 @@ app.get('/api/health', (_, res) => {
   res.json({ ok: true, timestamp: new Date().toISOString() });
 });
 // 👇 COLE AQUI (antes do app.listen)
+// =====================================================
+// GET /api/admin/dashboard — Dados do painel admin
+// =====================================================
+app.get('/api/admin/dashboard', async (req, res) => {
+  try {
+    const { data: sessions, error: sessionsError } = await supabase
+      .from('agil_sessions')
+      .select('*')
+      .order('updated_at', { ascending: false });
 
+    if (sessionsError) throw sessionsError;
+
+    const { data: payments, error: paymentsError } = await supabase
+      .from('agil_payments')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (paymentsError) throw paymentsError;
+
+    const totalSessions = sessions?.length || 0;
+    const totalPayments = payments?.filter(p =>
+      p.status === 'paid' ||
+      p.status_pagamento === 'paid' ||
+      p.status === 'completed'
+    ).length || 0;
+
+    const revenueCents = payments
+      ?.filter(p =>
+        p.status === 'paid' ||
+        p.status_pagamento === 'paid' ||
+        p.status === 'completed'
+      )
+      .reduce((sum, p) => sum + Number(p.valor_centavos || p.value || p.amount || 0), 0) || 0;
+
+    const leads = (sessions || []).map(session => {
+      const payment = (payments || []).find(p =>
+        p.session_id === session.id ||
+        p.sessionId === session.id ||
+        p.correlation_id === session.id
+      );
+
+      return {
+        id: session.id,
+        nome: session.nome || '',
+        email: session.email || '',
+        telefone: session.telefone || session.phone || '',
+        produto: session.produto || session.service_type || '',
+        tipo_beneficio: session.tipo_beneficio || '',
+        problema_principal: session.problema_principal || '',
+        origem: session.origem || 'site',
+        status_funil: session.status_funil || session.status || '',
+        status_pagamento: payment?.status_pagamento || payment?.status || 'sem_pagamento',
+        valor_centavos: payment?.valor_centavos || payment?.value || payment?.amount || 0,
+        created_at: session.created_at,
+        updated_at: session.updated_at
+      };
+    });
+
+    res.json({
+      success: true,
+      stats: {
+        totalSessions,
+        totalPayments,
+        revenueCents,
+        revenueFormatted: (revenueCents / 100).toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL'
+        })
+      },
+      leads
+    });
+  } catch (error) {
+    console.error('admin dashboard error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
 const OPENAI_CHAT_MODEL = process.env.OPENAI_CHAT_MODEL || 'gpt-4o';
 
 app.post('/api/chat', async (req, res) => {
