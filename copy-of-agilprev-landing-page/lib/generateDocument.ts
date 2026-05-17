@@ -45,7 +45,7 @@ Gere o documento COMPLETO agora:`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4o-mini',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.4,
         max_tokens: 4000,
@@ -91,22 +91,32 @@ Com base em tudo acima:
 
 Gere o documento COMPLETO E MELHORADO agora:`;
 
-  try {
-    const res = await fetch(`${API_URL}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gpt-4o',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.4,
-        max_tokens: 5000,
-      }),
-    });
-    if (!res.ok) throw new Error(`Erro ${res.status}`);
-    const data = await res.json() as { choices?: { message?: { content?: string } }[] };
-    const content = data.choices?.[0]?.message?.content?.trim() || '';
-    return { success: true, content };
-  } catch (e) {
-    return { success: false, content: '', error: (e as Error).message };
-  }
+try {
+  console.log('PREMIUM START');
+  console.log('Prompt size:', prompt.length);
+
+  const res = await fetch(`${API_URL}/api/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.4,
+      max_tokens: 2500,
+    }),
+  });
+
+  console.log('STATUS PREMIUM:', res.status);
+
+  if (!res.ok) throw new Error(`Erro ${res.status}`);
+
+  const data = await res.json() as { choices?: { message?: { content?: string } }[] };
+
+  console.log('DATA PREMIUM:', data);
+
+  const content = data.choices?.[0]?.message?.content?.trim() || '';
+  return { success: true, content };
+} catch (e) {
+  return { success: false, content: '', error: (e as Error).message };
+}
 }

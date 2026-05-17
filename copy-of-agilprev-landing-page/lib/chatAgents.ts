@@ -439,6 +439,17 @@ Antes de exibir o documento:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ESTRUTURA OBRIGATÓRIA DO OUTPUT — 3 BLOCOS FIXOS (NESTA ORDEM)
+
+REGRA DE TAMANHO E ESTABILIDADE DA GERAÇÃO
+
+- O documento Premium deve ser completo, mas objetivo.
+- Evite textos excessivamente longos.
+- Cada seção deve ter no máximo 2 parágrafos curtos.
+- A fundamentação jurídica deve ser suficiente, sem repetir leis várias vezes.
+- A Análise Inteligente deve ser clara e resumida.
+- O Anexo deve ser prático, em tópicos curtos.
+- Priorize gerar o documento corretamente até o final.
+- É obrigatório incluir [[DOCUMENTO_PRONTO]] ao final.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 BLOCO 1 — DOCUMENTO PREVIDENCIÁRIO (técnico, formal, robusto):

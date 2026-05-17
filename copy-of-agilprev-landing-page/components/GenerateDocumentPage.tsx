@@ -51,20 +51,19 @@ const GenerateDocumentPage: React.FC<GenerateDocumentPageProps> = ({
       const conversationRaw = localStorage.getItem('agil_conversation_data');
       const chatDocumentRaw = localStorage.getItem('agil_chat_document');
 
-      if (!conversationRaw) {
+      if (!conversationRaw && !chatDocumentRaw) {
         setError('Conversa não encontrada. Por favor, inicie um novo atendimento.');
         setGenerating(false);
         return;
       }
-
-      const conversation = JSON.parse(conversationRaw);
-
+      
+      const conversation = conversationRaw ? JSON.parse(conversationRaw) : {};
       setProgress(10);
       await tickProgress(30, 800);
 
       let result;
-      if (isPremium && chatDocumentRaw) {
-        const chatDocument = JSON.parse(chatDocumentRaw);
+      if (isPremium) {
+        const chatDocument = chatDocumentRaw || '';
         await tickProgress(55, 1000);
         result = await generatePremiumDocument(conversation, chatDocument);
       } else {
