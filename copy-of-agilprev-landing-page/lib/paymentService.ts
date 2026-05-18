@@ -51,6 +51,12 @@ export async function checkPaymentStatus(sessionId: string): Promise<StatusResul
   try {
     const res = await fetch(`${API_BASE}/api/payment-status/${sessionId}`);
     const data = await res.json();
+    if (data.status === "paid") {
+      trackEvent("pagamento_aprovado", {
+        status: "paid"
+      });
+    }
+    
     return { success: true, status: data.status };
   } catch {
     return { success: false, status: 'not_found' };
