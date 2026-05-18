@@ -65,7 +65,12 @@ const App: React.FC = () => {
     trackEvent("inicio_chat", {
       origem: type
     });
-  
+    
+    trackEvent("produto_escolhido", {
+      produto: type,
+      valor: type === "premium" ? 59 : type === "documento" ? 29 : 0
+    });
+    
     setSelectedService(type);
     setIsModalOpen(false);
     setGeneratedDoc('');
