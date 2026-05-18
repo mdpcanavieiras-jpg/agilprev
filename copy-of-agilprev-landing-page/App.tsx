@@ -28,6 +28,7 @@ import AdminPage from './components/AdminPage';
 // ──────────────────────────────────────────────────────────────────────
 type View = 'landing' | 'chat' | 'generating' | 'preview' | 'done';
 
+
 const App: React.FC = () => {
   if (window.location.pathname === '/admin') {
     return <AdminPage />;
