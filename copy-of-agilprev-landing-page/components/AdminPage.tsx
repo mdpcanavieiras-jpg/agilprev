@@ -44,8 +44,34 @@ type BenefitFilter =
   | 'revisao'
   | 'outro';
 
-function checkAdminPassword(input: string): boolean {
-  return input === 'Agilprev@2026';
+function getStoredToken(): string | null {
+  const raw = localStorage.getItem(ADMIN_SESSION_KEY);
+  return raw && raw.trim() ? raw.trim() : null;
+}
+
+function displayNome(nome: string): string {
+  return nome?.trim() ? nome.trim() : 'Lead sem nome';
+}
+
+function displayTelefone(telefone: string): string {
+  return telefone?.trim() ? telefone.trim() : 'Telefone não informado';
+}
+
+function displayBeneficio(beneficio: string): string {
+  return beneficio?.trim() ? beneficio.trim() : 'Não identificado';
+}
+
+function displayProblema(problema: string): string {
+  return problema?.trim() ? problema.trim() : 'Ainda não identificado';
+}
+
+function displayOptional(value: string): string {
+  return value?.trim() ? value.trim() : '—';
+}
+
+function hasTelefone(telefone: string): boolean {
+  const digits = telefone?.replace(/\D/g, '') ?? '';
+  return digits.length >= 10;
 }
 
 function normalizeDashboard(raw: Record<string, unknown>): DashboardData {
@@ -219,6 +245,15 @@ function whatsAppUrl(telefone: string): string {
   return `https://wa.me/${withCountry}`;
 }
 
+async function copyToClipboard(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function StatusBadge({ label, className }: { label: string; className: string }) {
   return (
     <span
@@ -263,11 +298,13 @@ function StatCard({
 }
 
 function AdminLogin({
-  onSuccess,
+  onLogin,
   error,
+  loading,
 }: {
-  onSuccess: (password: string) => void;
+  onLogin: (password: string) => void;
   error: string | null;
+  loading: boolean;
 }) {
   const [password, setPassword] = useState('');
 
@@ -288,7 +325,7 @@ function AdminLogin({
           className="space-y-4"
           onSubmit={(e) => {
             e.preventDefault();
-            onSuccess(password);
+            onLogin(password);
           }}
         >
           <label className="block">
@@ -301,7 +338,8 @@ function AdminLogin({
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Digite sua senha"
               autoComplete="current-password"
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#1e3a5f] focus:ring-2 focus:ring-[#1e3a5f]/20"
+              disabled={loading}
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#1e3a5f] focus:ring-2 focus:ring-[#1e3a5f]/20 disabled:opacity-60"
             />
           </label>
           {error && (
@@ -311,9 +349,10 @@ function AdminLogin({
           )}
           <button
             type="submit"
-            className="w-full rounded-xl bg-[#1e3a5f] py-3 text-sm font-semibold text-white transition hover:bg-[#162d4a]"
+            disabled={loading}
+            className="w-full rounded-xl bg-[#1e3a5f] py-3 text-sm font-semibold text-white transition hover:bg-[#162d4a] disabled:opacity-60"
           >
-            Entrar
+            {loading ? 'Entrando…' : 'Entrar'}
           </button>
         </form>
       </div>
@@ -338,7 +377,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
       <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">
         {label}
       </dt>
-      <dd className="mt-1 text-sm text-slate-800">{value || '—'}</dd>
+      <dd className="mt-1 break-words text-sm text-slate-800">{value}</dd>
     </div>
   );
 }
@@ -350,83 +389,128 @@ function LeadDetailPanel({
   lead: Lead;
   onClose: () => void;
 }) {
-  const phoneDigits = lead.telefone?.replace(/\D/g, '') ?? '';
+  const [copyHint, setCopyHint] = useState<string | null>(null);
+  const phoneOk = hasTelefone(lead.telefone);
+
+  const handleCopy = async (label: string, text: string) => {
+    const ok = await copyToClipboard(text);
+    setCopyHint(ok ? `${label} copiado` : `Não foi possível copiar ${label}`);
+    setTimeout(() => setCopyHint(null), 2000);
+  };
 
   return (
-  <>
-    <div
-      className="fixed inset-0 z-40 bg-black/40"
-      onClick={onClose}
-      aria-hidden
-    />
-    <aside
-      className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col bg-white shadow-2xl"
-      role="dialog"
-      aria-labelledby="lead-detail-title"
-    >
-      <div className="flex items-center justify-between border-b border-slate-100 bg-[#1e3a5f] px-6 py-4 text-white">
-        <h2 id="lead-detail-title" className="text-lg font-bold">
-          Detalhes do lead
-        </h2>
-        <button
-          type="button"
-          onClick={onClose}
-          className="rounded-lg px-3 py-1 text-sm hover:bg-white/10"
-          aria-label="Fechar"
-        >
-          ✕
-        </button>
-      </div>
+    <>
+      <div
+        className="fixed inset-0 z-40 bg-black/40"
+        onClick={onClose}
+        aria-hidden
+      />
+      <aside
+        className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col bg-white shadow-2xl"
+        role="dialog"
+        aria-labelledby="lead-detail-title"
+      >
+        <div className="flex items-center justify-between border-b border-slate-100 bg-[#1e3a5f] px-6 py-4 text-white">
+          <h2 id="lead-detail-title" className="text-lg font-bold">
+            Detalhes do lead
+          </h2>
+        </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-6">
-        <dl className="space-y-5">
-          <DetailRow label="Nome" value={lead.nome} />
-          <DetailRow label="E-mail" value={lead.email} />
-          <DetailRow label="Telefone" value={lead.telefone} />
-          <DetailRow label="Produto" value={lead.produto} />
-          <DetailRow label="Benefício" value={lead.tipo_beneficio} />
-          <DetailRow label="Problema principal" value={lead.problema_principal} />
-          <DetailRow label="Status do funil" value={lead.status_funil} />
-          <DetailRow
-            label="Status do pagamento"
-            value={formatStatusLabel(lead.status_pagamento)}
-          />
-          <DetailRow
-            label="Valor"
-            value={
-              lead.valor_centavos > 0
-                ? formatMoney(lead.valor_centavos)
-                : '—'
-            }
-          />
-          <DetailRow label="Data de criação" value={formatDate(lead.created_at)} />
-          <DetailRow
-            label="Última atualização"
-            value={formatDate(lead.updated_at)}
-          />
-        </dl>
+        <div className="flex-1 overflow-y-auto px-6 py-6">
+          <dl className="space-y-5">
+            <DetailRow label="ID da sessão" value={lead.id} />
+            <DetailRow label="Nome" value={displayNome(lead.nome)} />
+            <DetailRow label="E-mail" value={displayOptional(lead.email)} />
+            <DetailRow label="Telefone" value={displayTelefone(lead.telefone)} />
+            <DetailRow label="Produto" value={displayOptional(lead.produto)} />
+            <DetailRow
+              label="Tipo de benefício"
+              value={displayBeneficio(lead.tipo_beneficio)}
+            />
+            <DetailRow
+              label="Problema principal"
+              value={displayProblema(lead.problema_principal)}
+            />
+            <DetailRow label="Origem" value={displayOptional(lead.origem)} />
+            <DetailRow
+              label="Status do funil"
+              value={displayOptional(lead.status_funil)}
+            />
+            <DetailRow
+              label="Status do pagamento"
+              value={formatStatusLabel(lead.status_pagamento)}
+            />
+            <DetailRow
+              label="Valor"
+              value={
+                lead.valor_centavos > 0
+                  ? formatMoney(lead.valor_centavos)
+                  : '—'
+              }
+            />
+            <DetailRow
+              label="Data de criação"
+              value={formatDate(lead.created_at)}
+            />
+            <DetailRow
+              label="Última atualização"
+              value={formatDate(lead.updated_at)}
+            />
+          </dl>
 
-        {phoneDigits.length >= 10 && (
-          <a
-            href={whatsAppUrl(lead.telefone)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
-          >
-            Abrir WhatsApp
-          </a>
-        )}
-      </div>
-    </aside>
-  </>
+          {copyHint && (
+            <p className="mt-4 text-center text-xs font-medium text-emerald-700">
+              {copyHint}
+            </p>
+          )}
+
+          <div className="mt-8 space-y-2">
+            <button
+              type="button"
+              onClick={() => handleCopy('ID', lead.id)}
+              className="w-full rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-[#1e3a5f] hover:bg-slate-50"
+            >
+              Copiar ID
+            </button>
+            {phoneOk && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => handleCopy('telefone', lead.telefone.trim())}
+                  className="w-full rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-[#1e3a5f] hover:bg-slate-50"
+                >
+                  Copiar telefone
+                </button>
+                <a
+                  href={whatsAppUrl(lead.telefone)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex w-full items-center justify-center rounded-xl bg-emerald-600 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                >
+                  Abrir WhatsApp
+                </a>
+              </>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full rounded-xl bg-[#1e3a5f] py-2.5 text-sm font-semibold text-white transition hover:bg-[#162d4a]"
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      </aside>
+    </>
   );
 }
 
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(
-    () => localStorage.getItem(ADMIN_SESSION_KEY) === '1'
+    () => !!getStoredToken()
   );
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [loginLoading, setLoginLoading] = useState(false);
 
   const [data, setData] = useState<DashboardData | null>(null);
   const [loadState, setLoadState] = useState<LoadState>('idle');
@@ -441,15 +525,39 @@ export default function AdminPage() {
   const dataRef = useRef<DashboardData | null>(null);
   dataRef.current = data;
 
+  const clearSession = useCallback(() => {
+    localStorage.removeItem(ADMIN_SESSION_KEY);
+    setAuthenticated(false);
+    setData(null);
+    setLoadState('idle');
+    setSelectedLead(null);
+  }, []);
+
   const fetchDashboard = useCallback(async () => {
+    const token = getStoredToken();
+    if (!token) {
+      clearSession();
+      return;
+    }
+
     setLoadState('loading');
     setFetchError(null);
     try {
-      const res = await fetch(`${API_URL}/api/admin/dashboard`);
+      const res = await fetch(`${API_URL}/api/admin/dashboard`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const json = await res.json();
+
+      if (res.status === 401) {
+        clearSession();
+        setFetchError('Sessão expirada. Faça login novamente.');
+        return;
+      }
+
       if (!res.ok || json.success === false) {
         throw new Error(json.error || `Erro HTTP ${res.status}`);
       }
+
       setData(normalizeDashboard(json));
       setLastUpdated(new Date());
       setLoadState('success');
@@ -461,28 +569,39 @@ export default function AdminPage() {
       setFetchError(message);
       setLoadState(dataRef.current ? 'success' : 'error');
     }
-  }, []);
+  }, [clearSession]);
 
   useEffect(() => {
     if (authenticated) fetchDashboard();
   }, [authenticated, fetchDashboard]);
 
-  const handleLogin = (password: string) => {
-    if (checkAdminPassword(password)) {
-      localStorage.setItem(ADMIN_SESSION_KEY, '1');
+  const handleLogin = async (password: string) => {
+    setLoginLoading(true);
+    setLoginError(null);
+    try {
+      const res = await fetch(`${API_URL}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      const json = await res.json();
+
+      if (!res.ok || !json.success || !json.token) {
+        setLoginError('Senha incorreta');
+        return;
+      }
+
+      localStorage.setItem(ADMIN_SESSION_KEY, json.token);
       setAuthenticated(true);
-      setLoginError(null);
-    } else {
-      setLoginError('Senha incorreta');
+    } catch {
+      setLoginError('Não foi possível autenticar. Tente novamente.');
+    } finally {
+      setLoginLoading(false);
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem(ADMIN_SESSION_KEY);
-    setAuthenticated(false);
-    setData(null);
-    setLoadState('idle');
-    setSelectedLead(null);
+    clearSession();
   };
 
   const derivedMetrics = useMemo(() => {
@@ -522,7 +641,13 @@ export default function AdminPage() {
   }, [data, search, paymentFilter, productFilter, benefitFilter]);
 
   if (!authenticated) {
-    return <AdminLogin onSuccess={handleLogin} error={loginError} />;
+    return (
+      <AdminLogin
+        onLogin={handleLogin}
+        error={loginError}
+        loading={loginLoading}
+      />
+    );
   }
 
   if (loadState === 'loading' && !data) {
@@ -643,19 +768,17 @@ export default function AdminPage() {
 
         <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="border-b border-slate-100 p-6">
-            <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <h2 className="text-lg font-bold text-[#1e3a5f]">Leads</h2>
-                <p className="text-sm text-slate-500">
-                  {filteredLeads.length} de {data.leads.length} registros
-                </p>
-              </div>
+            <div className="mb-4">
+              <h2 className="text-lg font-bold text-[#1e3a5f]">Leads</h2>
+              <p className="text-sm text-slate-500">
+                {filteredLeads.length} de {data.leads.length} registros
+              </p>
             </div>
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <input
                 type="search"
-                placeholder="Buscar nome, e-mail, telefone…"
+                placeholder="Buscar nome, e-mail, telefone, produto, benefício…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="rounded-xl border border-slate-200 px-4 py-2 text-sm outline-none focus:border-[#1e3a5f] focus:ring-2 focus:ring-[#1e3a5f]/20"
@@ -735,22 +858,20 @@ export default function AdminPage() {
                     >
                       <td className="px-6 py-4">
                         <p className="font-medium text-slate-900">
-                          {lead.nome || '—'}
+                          {displayNome(lead.nome)}
                         </p>
                         <p className="text-xs text-slate-500">
-                          {lead.email || '—'}
+                          {displayOptional(lead.email)}
                         </p>
-                        {lead.telefone && (
-                          <p className="text-xs text-slate-400">
-                            {lead.telefone}
-                          </p>
-                        )}
+                        <p className="text-xs text-slate-400">
+                          {displayTelefone(lead.telefone)}
+                        </p>
                       </td>
                       <td className="px-4 py-4 text-slate-700">
-                        {lead.produto || '—'}
+                        {displayOptional(lead.produto)}
                       </td>
                       <td className="max-w-[120px] truncate px-4 py-4 text-slate-600">
-                        {lead.tipo_beneficio || '—'}
+                        {displayBeneficio(lead.tipo_beneficio)}
                       </td>
                       <td className="px-4 py-4">
                         <StatusBadge
@@ -770,7 +891,7 @@ export default function AdminPage() {
                           : '—'}
                       </td>
                       <td className="px-4 py-4 capitalize text-slate-500">
-                        {lead.origem || '—'}
+                        {displayOptional(lead.origem)}
                       </td>
                       <td className="whitespace-nowrap px-4 py-4 text-slate-500">
                         {formatDate(lead.updated_at || lead.created_at)}

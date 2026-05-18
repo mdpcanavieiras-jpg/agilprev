@@ -4,6 +4,7 @@ require('dotenv').config({ path: '.env.local' });
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const crypto = require('crypto');
 const axios = require('axios');
 const { createClient } = require('@supabase/supabase-js');
 const { v4: uuidv4 } = require('uuid');
@@ -421,11 +422,58 @@ app.post('/api/send-document-email', async (req, res) => {
 app.get('/api/health', (_, res) => {
   res.json({ ok: true, timestamp: new Date().toISOString() });
 });
-// 👇 COLE AQUI (antes do app.listen)
-// =====================================================
-// GET /api/admin/dashboard — Dados do painel admin
-// =====================================================
-app.get('/api/admin/dashboard', async (req, res) => {
+// ─── Admin (painel interno) ─────────────────────────────────────
+const ADMIN_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
+const adminTokens = new Map();
+
+function getAdminPassword() {
+  return process.env.ADMIN_PASSWORD || 'Agilprev@2026';
+}
+
+function createAdminToken() {
+  const token = crypto.randomBytes(32).toString('hex');
+  adminTokens.set(token, { createdAt: Date.now() });
+  return token;
+}
+
+function isValidAdminToken(token) {
+  if (!token || typeof token !== 'string') return false;
+  const entry = adminTokens.get(token);
+  if (!entry) return false;
+  if (Date.now() - entry.createdAt > ADMIN_TOKEN_TTL_MS) {
+    adminTokens.delete(token);
+    return false;
+  }
+  return true;
+}
+
+function extractAdminToken(req) {
+  const header = req.headers.authorization || '';
+  if (header.startsWith('Bearer ')) return header.slice(7).trim();
+  const alt = req.headers['x-admin-token'];
+  return typeof alt === 'string' ? alt.trim() : '';
+}
+
+function requireAdminAuth(req, res, next) {
+  const token = extractAdminToken(req);
+  if (!isValidAdminToken(token)) {
+    return res.status(401).json({ success: false, error: 'Não autorizado' });
+  }
+  next();
+}
+
+// POST /api/admin/login — Autenticação do painel admin
+app.post('/api/admin/login', (req, res) => {
+  const { password } = req.body || {};
+  if (password !== getAdminPassword()) {
+    return res.status(401).json({ success: false, error: 'Senha incorreta' });
+  }
+  const token = createAdminToken();
+  res.json({ success: true, token });
+});
+
+// GET /api/admin/dashboard — Dados do painel admin (requer token)
+app.get('/api/admin/dashboard', requireAdminAuth, async (req, res) => {
   try {
     const { data: sessions, error: sessionsError } = await supabase
       .from('agil_sessions')
