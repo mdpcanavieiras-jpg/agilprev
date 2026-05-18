@@ -28,7 +28,17 @@ import AdminPage from './components/AdminPage';
 // ──────────────────────────────────────────────────────────────────────
 type View = 'landing' | 'chat' | 'generating' | 'preview' | 'done';
 
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+  }
+}
 
+function trackEvent(eventName: string, params = {}) {
+  if (typeof window !== "undefined" && window.gtag) {
+    window.gtag("event", eventName, params);
+  }
+}
 const App: React.FC = () => {
   if (window.location.pathname === '/admin') {
     return <AdminPage />;
@@ -52,6 +62,10 @@ const App: React.FC = () => {
   const closeModal = () => setIsModalOpen(false);
 
   const startChat = (type: 'hero' | 'documento' | 'premium') => {
+    trackEvent("inicio_chat", {
+      origem: type
+    });
+  
     setSelectedService(type);
     setIsModalOpen(false);
     setGeneratedDoc('');
