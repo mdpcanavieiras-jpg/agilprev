@@ -1,5 +1,17 @@
 const API_BASE = 'https://agilprev-production.up.railway.app';
 
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+  }
+}
+
+function trackEvent(eventName: string, params = {}) {
+  if (typeof window !== "undefined" && window.gtag) {
+    window.gtag("event", eventName, params);
+  }
+}
+
 export interface ChargeResult {
   success: boolean;
   correlationID?: string;
@@ -25,6 +37,10 @@ export async function createPixCharge(
       body: JSON.stringify({ sessionId, serviceType }),
     });
     const data = await res.json();
+    trackEvent("pix_criado", {
+      produto: serviceType,
+      valor: serviceType === "premium" ? 59 : 29
+    });
     return data;
   } catch (e) {
     return { success: false, error: (e as Error).message };
