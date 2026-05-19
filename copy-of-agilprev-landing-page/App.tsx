@@ -89,7 +89,11 @@ const App: React.FC = () => {
       localStorage.getItem('agil_chat_document') ||
       '';
   
-    await saveSession(sessionId, selectedService, conversationData);
+      try {
+        await saveSession(sessionId, selectedService, conversationData);
+      } catch (e) {
+        console.warn("Erro ao salvar sessão antes da geração:", e);
+      }
   
     window.scrollTo(0, 0);
     setCurrentView('generating');
