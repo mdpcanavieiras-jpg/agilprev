@@ -21,6 +21,7 @@ import ChatPage from './components/ChatPage';
 import GenerateDocumentPage from './components/GenerateDocumentPage';
 import PreviewDocumentPage from './components/PreviewDocumentPage';
 import AdminPage from './components/AdminPage';
+import { saveSession } from './lib/paymentService';
 
 // ──────────────────────────────────────────────────────────────────────
 // FLUXO CORRETO:
@@ -82,7 +83,14 @@ const App: React.FC = () => {
   };
 
   // Chat terminou → ir para página de geração (com loading real)
-  const goToGenerating = () => {
+  const goToGenerating = async () => {
+    const conversationData =
+      localStorage.getItem('agil_conversation_data') ||
+      localStorage.getItem('agil_chat_document') ||
+      '';
+  
+    await saveSession(sessionId, selectedService, conversationData);
+  
     window.scrollTo(0, 0);
     setCurrentView('generating');
   };
