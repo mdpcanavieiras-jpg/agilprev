@@ -230,10 +230,10 @@ useEffect(() => {
 
     const typingDelay =
   text.length < 20
-    ? 1500
+    ? 3500
     : text.length < 80
-    ? 2500
-    : 4000;
+    ? 6000
+    : 8500;
 
 await new Promise(r => setTimeout(r, typingDelay));
 
