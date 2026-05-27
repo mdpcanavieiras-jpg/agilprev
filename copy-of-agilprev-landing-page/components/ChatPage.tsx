@@ -114,9 +114,52 @@ const ChatPage: React.FC<ChatPageProps> = ({ serviceType, setSelectedService, on
   const accent    = isPremium ? '#22c55e' : '#2563eb';
   const accentDark = isPremium ? '#16a34a' : '#1d4ed8';
 
-  const [messages, setMessages]         = useState<UIMessage[]>([
+  const [messages, setMessages] = useState<UIMessage[]>([
     { id: 1, role: 'assistant', content: getOpeningMessage(serviceType), time: nowTime() },
   ]);
+  
+  const openingDelayShown = useRef(false);
+
+useEffect(() => {
+  if (openingDelayShown.current) return;
+  openingDelayShown.current = true;
+
+  if (serviceType === 'documento') {
+    setLoading(true);
+
+    setTimeout(() => {
+      setLoading(false);
+
+      setMessages(prev => [
+        ...prev,
+        {
+          id: Date.now(),
+          role: 'assistant',
+          content: 'Vamos preparar seu documento do INSS. Qual é o seu nome completo?',
+          time: nowTime(),
+        },
+      ]);
+    }, 3200);
+    }
+  
+    if (serviceType === 'premium') {
+      setLoading(true);
+    
+      setTimeout(() => {
+        setLoading(false);
+    
+        setMessages(prev => [
+          ...prev,
+          {
+            id: Date.now(),
+            role: 'assistant',
+            content: 'Para iniciar, preciso do seu nome completo, conforme consta nos seus documentos oficiais.',
+            time: nowTime(),
+          },
+        ]);
+      }, 5200);
+    }
+  }, []);
   const [input, setInput]               = useState('');
   const [loading, setLoading]           = useState(false);
   const [documentReady, setDocumentReady] = useState(false);

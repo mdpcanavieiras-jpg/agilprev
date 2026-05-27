@@ -994,13 +994,9 @@ export function getOpeningMessage(serviceType: 'hero' | 'documento' | 'premium')
   Estou aqui para explicar com calma e sem complicação.`;
   }
   if (serviceType === 'premium') {
-    return 'Olá. Sou o Daniel, do Agilprev.\nVou conduzir seu atendimento de forma clara e estruturada, para que seu documento seja gerado com precisão.\n\nPara iniciar, preciso do seu nome completo, conforme consta nos seus documentos oficiais.';
+    return `Olá. Sou o Daniel, do Agilprev. Vou conduzir seu atendimento de forma clara e estruturada, para que seu documento seja gerado com precisão.`;
   }
   if (serviceType === 'documento') {
-  return `Olá! Sou o Agilprev 👍
-
-  Vamos preparar seu documento do INSS.
-  
-  Qual é o seu nome completo?`;
-}
+    return 'Olá! Sou o Nel do Agilprev 👍';
+  }
 }
