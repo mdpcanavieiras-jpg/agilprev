@@ -12,6 +12,34 @@ function trackEvent(eventName: string, params = {}) {
   }
 }
 
+const GADS_CONVERSION_PREFIX = "agilprev_gads_conv_";
+
+function trackGoogleAdsConversion(sessionId: string, serviceType: string) {
+  if (typeof window === "undefined" || !window.gtag) return;
+
+  const storageKey = `${GADS_CONVERSION_PREFIX}${sessionId}`;
+  try {
+    if (localStorage.getItem(storageKey) === "1") return;
+  } catch {
+    /* localStorage indisponível */
+  }
+
+  const value = serviceType === "premium" ? 59 : 29;
+
+  window.gtag("event", "conversion", {
+    send_to: "AW-18171331552/CcZ7CMbwja8cEOCH4thD",
+    value,
+    currency: "BRL",
+    transaction_id: sessionId,
+  });
+
+  try {
+    localStorage.setItem(storageKey, "1");
+  } catch {
+    /* localStorage indisponível */
+  }
+}
+
 export interface ChargeResult {
   success: boolean;
   correlationID?: string;
@@ -55,6 +83,9 @@ export async function checkPaymentStatus(sessionId: string): Promise<StatusResul
       trackEvent("pagamento_aprovado", {
         status: "paid"
       });
+      if (data.serviceType) {
+        trackGoogleAdsConversion(sessionId, data.serviceType);
+      }
     }
     
     return { success: true, status: data.status };
