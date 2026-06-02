@@ -107,9 +107,9 @@ const App: React.FC = () => {
   }, []);
 
   // Pagamento confirmado → baixar PDF + ir para tela de conclusão
-  const downloadAndFinish = useCallback(() => {
+  const downloadAndFinish = useCallback(async () => {
     if (!generatedDoc) return;
-    buildAndDownloadPDF(generatedDoc, selectedService);
+    await buildAndDownloadPDF(generatedDoc, selectedService);
     window.scrollTo(0, 0);
     setCurrentView('done');
   }, [generatedDoc, selectedService]);
@@ -191,8 +191,8 @@ if (currentView === 'done') {
       generatedDoc={generatedDoc}
       onNewConsultation={goToLanding}
       onDownloadAgain={() =>
-        buildAndDownloadPDF(generatedDoc, selectedService)
-      }
+  buildAndDownloadPDF(generatedDoc, selectedService)
+}
       onSendEmail={sendDocumentByEmail}
     />
   );
@@ -365,14 +365,42 @@ const DonePage: React.FC<DonePageProps> = ({ serviceType, onNewConsultation, onD
 // ──────────────────────────────────────────────────────────────────────
 // Gera e baixa o PDF a partir do conteúdo já pronto
 // ──────────────────────────────────────────────────────────────────────
-function buildAndDownloadPDF(content: string, serviceType: 'documento' | 'premium') {
+async function buildAndDownloadPDF(content: string, serviceType: 'documento' | 'premium') {
   const isPremium = serviceType === 'premium';
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const pw   = doc.internal.pageSize.getWidth();
   const ph   = doc.internal.pageSize.getHeight();
   const m    = 20;
   let y      = m;
+  const WATERMARK_URL = '/agilprev-watermark.png';
 
+  const loadImageAsBase64 = async (url: string): Promise<string> => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+  
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
+  const watermarkBase64 = await loadImageAsBase64(WATERMARK_URL);
+
+  // Marca d'água
+  try {
+    doc.addImage(
+      watermarkBase64,
+      'PNG',
+      45,   // posição X
+      70,   // posição Y
+      120,  // largura
+      120   // altura
+    );
+  } catch (e) {
+    console.error('Erro ao carregar marca d’água', e);
+  }
+  
   // Cabeçalho
   doc.setFontSize(22); doc.setFont('helvetica', 'bold');
   doc.setTextColor(37, 99, 235);
@@ -395,12 +423,61 @@ function buildAndDownloadPDF(content: string, serviceType: 'documento' | 'premiu
   doc.setDrawColor(r, g, b); doc.setLineWidth(0.6);
   doc.line(m, y, pw - m, y); y += 1; doc.line(m, y, pw - m, y); y += 12;
 
-  // Corpo
-  doc.setFontSize(10.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(0, 0, 0);
-  const lines = doc.splitTextToSize(content, pw - 2 * m);
-  (lines as string[]).forEach(line => {
-    if (y > ph - 28) { doc.addPage(); y = m; }
-    doc.text(line, m, y); y += 5.5;
+  // Corpo — títulos jurídicos destacados; demais linhas inalteradas
+  const AGIL_BLUE: [number, number, number] = [37, 99, 235];
+  const BODY_FONT = 10.5;
+  const TITLE_FONT = 12.5;
+  const LINE_H = 5.5;
+  const TITLE_LINE_H = 6.5;
+  const FOOTER_RESERVE = 28;
+  const contentW = pw - 2 * m;
+
+  const isAnnexSectionStart = (line: string) => {
+    const t = line.trim();
+    return /^(?:[IVXLC]+\s*[–\-—.]\s*)?P[AÁ]GINA\s+EM\s+ANEXO(?:\s*[–\-—]\s*INSTRU[ÇC][OÕ]ES\s+PR[AÁ]TICAS)?\s*[.:]?\s*$/iu.test(t)
+      || /^(?:[IVXLC]+\s*[–\-—.]\s*)?INSTRU[ÇC][OÕ]ES\s+PR[AÁ]TICAS\s*[.:]?\s*$/iu.test(t);
+  };
+
+  const isLegalSectionTitle = (line: string) =>
+    /^(?:[IVXLC]+\s*[–\-—.]\s*)?(?:DOS\s+FATOS|DO\s+DIREITO|DOS\s+PEDIDOS|FUNDAMENTA[ÇC][AÃ]O\s+LEGAL|CONCLUS[AÃ]O|P[AÁ]GINA\s+EM\s+ANEXO(?:\s*[–\-—]\s*INSTRU[ÇC][OÕ]ES\s+PR[AÁ]TICAS)?|INSTRU[ÇC][OÕ]ES\s+PR[AÁ]TICAS)\s*[.:]?\s*$/iu.test(line.trim());
+
+  const ensureSpace = (needed: number) => {
+    if (y + needed > ph - FOOTER_RESERVE) { doc.addPage(); y = m; }
+  };
+
+  const drawBodyLines = (text: string) => {
+    doc.setFontSize(BODY_FONT);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(0, 0, 0);
+    (doc.splitTextToSize(text, contentW) as string[]).forEach(line => {
+      ensureSpace(LINE_H);
+      doc.text(line, m, y);
+      y += LINE_H;
+    });
+  };
+
+  const drawLegalTitle = (text: string) => {
+    y += 6;
+    doc.setFontSize(TITLE_FONT);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...AGIL_BLUE);
+    (doc.splitTextToSize(text.trim(), contentW) as string[]).forEach(line => {
+      ensureSpace(TITLE_LINE_H);
+      doc.text(line, m, y);
+      y += TITLE_LINE_H;
+    });
+    y += 4;
+  };
+
+  content.split(/\r?\n/).forEach(paragraph => {
+    const trimmed = paragraph.trim();
+    if (!trimmed) { y += 2.5; return; }
+    if (isAnnexSectionStart(trimmed)) {
+      doc.addPage();
+      y = m;
+    }
+    if (isLegalSectionTitle(trimmed)) drawLegalTitle(trimmed);
+    else drawBodyLines(trimmed);
   });
 
   // Rodapé

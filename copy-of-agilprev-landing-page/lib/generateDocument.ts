@@ -28,15 +28,29 @@ ${ADDITIONAL_CONTEXT}
 ${summary}
 
 ===INSTRUÇÕES===
-Com base na conversa acima e na base de conhecimento, gere o documento jurídico FORMAL e COMPLETO para protocolo no INSS.
-1. Identifique o tipo de documento mais adequado ao caso.
-2. Use estrutura formal correta (Título, Identificação, Dos Fatos, Do Direito, Do Pedido).
-3. Inclua fundamentação legal completa: CF/88, Lei 8.213/91, Lei 9.784/99, jurisprudência.
-4. Cite jurisprudência (STF, STJ, TNU) quando aplicável.
-5. Use os dados reais coletados na conversa.
-6. Ao final, inclua obrigatoriamente a "PÁGINA EM ANEXO – INSTRUÇÕES PRÁTICAS".
-7. Formate com seções claras. Linguagem formal mas acessível.
-8. Não inclua marcadores especiais. Apenas texto puro do documento.
+Com base na conversa acima e na base de conhecimento, gere o documento previdenciário FORMAL, ÚTIL e PERSONALIZADO para o caso do usuário.
+
+REGRAS OBRIGATÓRIAS:
+1. Identifique o tipo de documento mais adequado ao caso, com base nas respostas reais do usuário.
+2. Use estrutura formal clara: Título, Identificação, Resumo do Caso, Dos Fatos, Do Direito, Dos Pedidos e Encerramento.
+3. Use fundamentação legal relacionada ao benefício ou problema informado.
+4. Cite apenas fundamentos legais compatíveis com o caso. Não cite leis aleatórias.
+5. Não invente dados pessoais, datas, número de protocolo, endereço, vara, comarca ou cidade.
+6. Se a data atual for necessária, use exatamente: ${new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}.
+7. Se o número de protocolo não tiver sido informado, escreva: "pedido administrativo junto ao INSS", sem colchetes.
+8. Nunca escreva placeholders como [Data], [número do protocolo], [cidade], [nome] ou similares.
+9. Remova totalmente qualquer seção chamada "DO VALOR DA CAUSA".
+10. Não atribua valor à causa.
+11. Não gere texto dizendo "Dá-se à causa o valor de...".
+12. Ao final do documento principal, escreva o local e data apenas se a cidade tiver sido informada. Caso contrário, escreva apenas a data.
+13. Inclua a seção "PÁGINA EM ANEXO – INSTRUÇÕES PRÁTICAS" somente após o encerramento do documento.
+14. A página em anexo deve ser separada conceitualmente do documento principal, com título próprio.
+15. Linguagem formal, clara e acessível.
+16. Não prometa resultado, não garanta aprovação e não critique o INSS de forma ofensiva.
+17. Gere apenas texto puro do documento.
+
+IMPORTANTE:
+O documento deve parecer profissional, personalizado e confiável, mesmo sendo a versão básica.
 
 Gere o documento COMPLETO agora:`;
 
