@@ -1,5 +1,5 @@
 import { DOCUMENT_KNOWLEDGE_BASE, ADDITIONAL_CONTEXT, PREMIUM_ANALYSIS_TEMPLATE } from './documentKnowledgeBase';
-
+import { DOCUMENT_SKILLS } from './skills/documentKnowledgeBase';
 const API_URL = import.meta.env.VITE_API_URL;
   
 
@@ -14,15 +14,58 @@ export interface GenerateResult {
   error?: string;
 }
 
+function getRelevantDocumentSkill(summary: string) {
+  const normalizedSummary = summary.toLowerCase();
+
+  for (const [skillName, skill] of Object.entries(DOCUMENT_SKILLS)) {
+    const matched = skill.palavrasChave.some((keyword: string) =>
+      normalizedSummary.includes(keyword.toLowerCase())
+    );
+
+    if (matched) {
+      return {
+        skillName,
+        ...skill
+      };
+    }
+  }
+
+  return null;
+}
 /**
  * Documento Básico: chama a OpenAI com a knowledge base completa + conversa
  */
 export async function generateBasicDocument(conversation: ConversationMessage[]): Promise<GenerateResult> {
   const summary = conversation.map(m => `${m.role}: ${m.content}`).join('\n\n');
 
+  const detectedSkill = getRelevantDocumentSkill(summary);
+  const skillContext = detectedSkill
+  ? `
+TIPO DETECTADO: ${detectedSkill.tipoDocumento}
+
+PERGUNTAS IMPORTANTES:
+${detectedSkill.perguntasExtras.join('\n')}
+
+O documento deve ser estruturado especificamente para este tipo de caso.
+`
+  : '';
+
   const prompt = `${DOCUMENT_KNOWLEDGE_BASE}
 
 ${ADDITIONAL_CONTEXT}
+
+${skillContext}
+
+===SKILL IDENTIFICADA===
+
+Tipo de Documento:
+${detectedSkill?.tipoDocumento || 'DOCUMENTO_PREVIDENCIARIO'}
+
+Perguntas Relevantes:
+${detectedSkill?.perguntasExtras?.join('\n') || 'Nenhuma'}
+
+Instrução:
+Caso uma skill tenha sido identificada, adapte o documento ao contexto específico detectado.
 
 ===CONVERSA COMPLETA===
 ${summary}
@@ -48,6 +91,34 @@ REGRAS OBRIGATÓRIAS:
 15. Linguagem formal, clara e acessível.
 16. Não prometa resultado, não garanta aprovação e não critique o INSS de forma ofensiva.
 17. Gere apenas texto puro do documento.
+18. A seção DOS FATOS deve conter no mínimo 3 parágrafos explicando a situação relatada pelo usuário.
+19. A seção DO DIREITO deve explicar de forma clara os direitos relacionados ao caso identificado.
+20. A seção DOS PEDIDOS deve ser específica para o problema apresentado.
+21. A seção PÁGINA EM ANEXO – INSTRUÇÕES PRÁTICAS deve conter orientações detalhadas e acionáveis.
+22. Sempre explicar próximos passos possíveis junto ao INSS.
+23. O documento deve ter aparência de documento profissional elaborado para protocolo administrativo.
+24. Evite textos genéricos ou excessivamente curtos.
+25. Desenvolva os tópicos com profundidade adequada ao caso apresentado.
+26. Se não houver informação de cidade ou vara competente, escrever apenas:
+"À JUSTIÇA FEDERAL COMPETENTE".
+27. É proibido gerar:
+[CIDADE]
+[CIDADE/UF]
+[DATA]
+[NOME]
+[PROTOCOLO]
+___ª Vara
+ou qualquer placeholder semelhante.
+28. Nunca utilize markdown.
+29. Não utilize **texto**, ##, ###, --- ou qualquer sintaxe markdown.
+30. Entregue somente texto puro.
+31. DOS FATOS deve possuir no mínimo 3 parágrafos.
+32. DO DIREITO deve possuir no mínimo 2 parágrafos.
+33. DOS PEDIDOS deve conter fundamentação e explicação do motivo de cada pedido.
+34. O documento deve possuir no mínimo 1 página completa de conteúdo antes da seção de instruções práticas.
+35. Desenvolva os fatos com riqueza de detalhes baseada exclusivamente nas informações fornecidas pelo usuário.
+36. Explique de forma didática por que o direito do usuário pode estar sendo afetado.
+37. As orientações práticas devem conter passo a passo claro para o cidadão comum.
 
 IMPORTANTE:
 O documento deve parecer profissional, personalizado e confiável, mesmo sendo a versão básica.

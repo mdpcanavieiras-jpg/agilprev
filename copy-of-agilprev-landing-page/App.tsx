@@ -470,12 +470,21 @@ async function buildAndDownloadPDF(content: string, serviceType: 'documento' | '
   };
 
   content.split(/\r?\n/).forEach(paragraph => {
-    const trimmed = paragraph.trim();
+    const trimmed = paragraph
+      .trim()
+      .replace(/\*\*/g, '')
+      .replace(/^[-–—]{3,}$/, '')
+      .trim();
+  
     if (!trimmed) { y += 2.5; return; }
+  
     if (isAnnexSectionStart(trimmed)) {
-      doc.addPage();
+      if (y > m + 10) {
+        doc.addPage();
+      }
       y = m;
     }
+  
     if (isLegalSectionTitle(trimmed)) drawLegalTitle(trimmed);
     else drawBodyLines(trimmed);
   });

@@ -25,14 +25,52 @@ export const DOCUMENT_SKILLS = {
         'não responde',
         'parado'
       ],
-  
+    
       perguntasExtras: [
         'Há quantos meses o pedido está parado?',
         'Você possui número de protocolo?',
         'Recebeu alguma carta do INSS?'
       ],
-  
-      tipoDocumento: 'MANDADO_SEGURANCA_DEMORA'
+    
+      tipoDocumento: 'MANDADO_SEGURANCA_DEMORA',
+    
+      tituloDocumento: 'Análise de Demora Administrativa do INSS',
+    
+      objetivoDocumento: `
+    Avaliar situação de benefício ou requerimento que permanece sem decisão administrativa por período superior ao esperado.
+    `,
+    
+      fundamentacaoLegal: `
+    A Administração Pública possui dever de decidir os requerimentos apresentados pelos cidadãos dentro de prazo razoável.
+    
+    A Constituição Federal assegura a duração razoável do processo.
+    
+    A Lei 9.784/1999 determina que os processos administrativos sejam concluídos em prazo adequado.
+    
+    Em situações de demora excessiva pode existir fundamento para medidas administrativas ou judiciais.
+    `,
+    
+      argumentosPrincipais: [
+        'existência de protocolo administrativo',
+        'demora superior ao prazo razoável',
+        'ausência de resposta do INSS',
+        'necessidade de conclusão do requerimento',
+        'direito à análise administrativa'
+      ],
+    
+      pedidosRecomendados: [
+        'solicitação de andamento',
+        'pedido de conclusão da análise',
+        'reclamação administrativa',
+        'avaliação de mandado de segurança quando aplicável'
+      ],
+    
+      proximosPassos: [
+        'guardar protocolo',
+        'acompanhar Meu INSS',
+        'registrar novas movimentações',
+        'manter documentos organizados'
+      ]
     },
   
     beneficioNegado: {
