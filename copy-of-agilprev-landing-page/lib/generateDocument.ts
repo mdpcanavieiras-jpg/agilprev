@@ -43,10 +43,28 @@ export async function generateBasicDocument(conversation: ConversationMessage[])
   ? `
 TIPO DETECTADO: ${detectedSkill.tipoDocumento}
 
+TÍTULO RECOMENDADO:
+${(detectedSkill as any).tituloDocumento || ''}
+
+OBJETIVO DO DOCUMENTO:
+${(detectedSkill as any).objetivoDocumento || ''}
+
+FUNDAMENTAÇÃO LEGAL ESPECÍFICA:
+${(detectedSkill as any).fundamentacaoLegal || ''}
+
+ARGUMENTOS PRINCIPAIS:
+${(detectedSkill as any).argumentosPrincipais?.join('\n') || ''}
+
+PEDIDOS RECOMENDADOS:
+${(detectedSkill as any).pedidosRecomendados?.join('\n') || ''}
+
+PRÓXIMOS PASSOS:
+${(detectedSkill as any).proximosPassos?.join('\n') || ''}
+
 PERGUNTAS IMPORTANTES:
 ${detectedSkill.perguntasExtras.join('\n')}
 
-O documento deve ser estruturado especificamente para este tipo de caso.
+O documento deve ser estruturado especificamente para este tipo de caso, usando a fundamentação, argumentos, pedidos e próximos passos acima.
 `
   : '';
 
