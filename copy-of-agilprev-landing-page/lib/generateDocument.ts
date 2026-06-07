@@ -14,8 +14,10 @@ export interface GenerateResult {
   error?: string;
 }
 
-function getRelevantDocumentSkill(summary: string) {
+function getRelevantDocumentSkills(summary: string) {
   const normalizedSummary = summary.toLowerCase();
+
+  const matches = [];
 
   for (const [skillName, skill] of Object.entries(DOCUMENT_SKILLS)) {
     const matched = skill.palavrasChave.some((keyword: string) =>
@@ -23,14 +25,14 @@ function getRelevantDocumentSkill(summary: string) {
     );
 
     if (matched) {
-      return {
+      matches.push({
         skillName,
         ...skill
-      };
+      });
     }
   }
 
-  return null;
+  return matches;
 }
 /**
  * Documento Básico: chama a OpenAI com a knowledge base completa + conversa
@@ -38,35 +40,34 @@ function getRelevantDocumentSkill(summary: string) {
 export async function generateBasicDocument(conversation: ConversationMessage[]): Promise<GenerateResult> {
   const summary = conversation.map(m => `${m.role}: ${m.content}`).join('\n\n');
 
-  const detectedSkill = getRelevantDocumentSkill(summary);
-  const skillContext = detectedSkill
-  ? `
-TIPO DETECTADO: ${detectedSkill.tipoDocumento}
+  const detectedSkills = getRelevantDocumentSkills(summary);
+  const skillContext = detectedSkills
+  .map((skill: any) => `
+TIPO DETECTADO:
+${skill.tipoDocumento}
 
-TÍTULO RECOMENDADO:
-${(detectedSkill as any).tituloDocumento || ''}
+TÍTULO:
+${skill.tituloDocumento || ''}
 
-OBJETIVO DO DOCUMENTO:
-${(detectedSkill as any).objetivoDocumento || ''}
+OBJETIVO:
+${skill.objetivoDocumento || ''}
 
-FUNDAMENTAÇÃO LEGAL ESPECÍFICA:
-${(detectedSkill as any).fundamentacaoLegal || ''}
+FUNDAMENTAÇÃO:
+${skill.fundamentacaoLegal || ''}
 
-ARGUMENTOS PRINCIPAIS:
-${(detectedSkill as any).argumentosPrincipais?.join('\n') || ''}
+ARGUMENTOS:
+${skill.argumentosPrincipais?.join('\n') || ''}
 
-PEDIDOS RECOMENDADOS:
-${(detectedSkill as any).pedidosRecomendados?.join('\n') || ''}
+PEDIDOS:
+${skill.pedidosRecomendados?.join('\n') || ''}
 
 PRÓXIMOS PASSOS:
-${(detectedSkill as any).proximosPassos?.join('\n') || ''}
+${skill.proximosPassos?.join('\n') || ''}
 
 PERGUNTAS IMPORTANTES:
-${detectedSkill.perguntasExtras.join('\n')}
-
-O documento deve ser estruturado especificamente para este tipo de caso, usando a fundamentação, argumentos, pedidos e próximos passos acima.
-`
-  : '';
+${skill.perguntasExtras?.join('\n') || ''}
+`)
+  .join('\n\n');
 
   const prompt = `${DOCUMENT_KNOWLEDGE_BASE}
 
@@ -76,12 +77,11 @@ ${skillContext}
 
 ===SKILL IDENTIFICADA===
 
-Tipo de Documento:
-${detectedSkill?.tipoDocumento || 'DOCUMENTO_PREVIDENCIARIO'}
+Tipos de Documento Detectados:
+${detectedSkills.map((skill: any) => skill.tipoDocumento).join('\n') || 'DOCUMENTO_PREVIDENCIARIO'}
 
 Perguntas Relevantes:
-${detectedSkill?.perguntasExtras?.join('\n') || 'Nenhuma'}
-
+${detectedSkills.flatMap((skill: any) => skill.perguntasExtras || []).join('\n') || 'Nenhuma'}
 Instrução:
 Caso uma skill tenha sido identificada, adapte o documento ao contexto específico detectado.
 
@@ -137,6 +137,7 @@ ou qualquer placeholder semelhante.
 35. Desenvolva os fatos com riqueza de detalhes baseada exclusivamente nas informações fornecidas pelo usuário.
 36. Explique de forma didática por que o direito do usuário pode estar sendo afetado.
 37. As orientações práticas devem conter passo a passo claro para o cidadão comum.
+38. Quando houver mais de uma categoria detectada, combine os fundamentos das categorias. Exemplo: se houver demora do INSS e salário-maternidade, o documento deve tratar tanto da demora administrativa quanto dos fundamentos do salário-maternidade.
 
 IMPORTANTE:
 O documento deve parecer profissional, personalizado e confiável, mesmo sendo a versão básica.
