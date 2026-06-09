@@ -9,7 +9,7 @@ interface ChatPageProps {
   onFinish: () => void;
 }
 
-const LOGO = 'https://horizons-cdn.hostinger.com/195324a5-5ad8-4c91-83fb-8e15c14e8dfe/94ac8ec0e4dff84bff0c6eccb37a8b58.png';
+const LOGO = '/agilprev-watermark.png'
 
 interface UIMessage {
   id: number;
@@ -43,7 +43,7 @@ const SidePanel: React.FC<{ isPremium: boolean }> = ({ isPremium }) => {
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100">
-            <img src={LOGO} alt="Agilprev" className="w-7 h-7 object-contain" />
+            <img src={LOGO} alt="Agilprev" className="w-8 h-8 object-contain" />
           </div>
           <div>
             <p className="font-black text-slate-900 text-sm leading-none">Agilprev</p>
