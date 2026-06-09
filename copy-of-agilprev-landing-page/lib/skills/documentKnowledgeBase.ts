@@ -386,7 +386,8 @@ export const DOCUMENT_SKILLS = {
         'guardar protocolos do INSS',
         'acompanhar o pedido pelo Meu INSS'
       ]
-    },
+    }
+  };
 
   export const HERO_SKILLS = {
     acolhimento: {
