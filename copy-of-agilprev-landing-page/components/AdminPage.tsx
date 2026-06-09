@@ -325,6 +325,127 @@ function BenefitBadge({ beneficio }: { beneficio: string }) {
   );
 }
 
+function LeadsEmptyState({
+  totalLeads,
+  onClearFilters,
+}: {
+  totalLeads: number;
+  onClearFilters: () => void;
+}) {
+  const filteredEmpty = totalLeads > 0;
+
+  return (
+    <div className="px-6 py-16 text-center">
+      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-7 w-7"
+          aria-hidden
+        >
+          {filteredEmpty ? (
+            <>
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+              <path d="M8 11h6" />
+            </>
+          ) : (
+            <>
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </>
+          )}
+        </svg>
+      </div>
+      <p className="text-base font-semibold text-slate-700">
+        {filteredEmpty
+          ? 'Nenhum lead encontrado'
+          : 'Nenhum lead registrado ainda'}
+      </p>
+      <p className="mx-auto mt-2 max-w-sm text-sm text-slate-500">
+        {filteredEmpty
+          ? 'Nenhum registro corresponde aos filtros ou à busca atuais. Tente ampliar os critérios ou limpar os filtros.'
+          : 'Quando usuários iniciarem o fluxo no site, os registros aparecerão aqui automaticamente.'}
+      </p>
+      {filteredEmpty && (
+        <button
+          type="button"
+          onClick={onClearFilters}
+          className="mt-6 rounded-xl border border-[#1e3a5f]/20 bg-[#1e3a5f]/5 px-5 py-2.5 text-sm font-semibold text-[#1e3a5f] transition hover:bg-[#1e3a5f]/10"
+        >
+          Limpar filtros
+        </button>
+      )}
+    </div>
+  );
+}
+
+function LeadCard({
+  lead,
+  onSelect,
+}: {
+  lead: Lead;
+  onSelect: () => void;
+}) {
+  return (
+    <article className="rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-medium text-slate-900">{displayNome(lead.nome)}</p>
+          <p className="mt-0.5 truncate text-xs text-slate-500">
+            {displayOptional(lead.email)}
+          </p>
+          <p
+            className={`mt-0.5 text-xs ${hasTelefone(lead.telefone) ? 'text-slate-400' : 'italic text-slate-400'}`}
+          >
+            {displayTelefone(lead.telefone)}
+          </p>
+        </div>
+        <p className="shrink-0 text-sm font-semibold text-slate-800">
+          {lead.valor_centavos > 0 ? formatMoney(lead.valor_centavos) : '—'}
+        </p>
+      </div>
+
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <BenefitBadge beneficio={lead.tipo_beneficio} />
+        <StatusBadge
+          label={lead.status_funil || '—'}
+          className={funnelBadgeClass(lead.status_funil)}
+          variant="funnel"
+        />
+        <StatusBadge
+          label={lead.status_pagamento}
+          className={paymentBadgeClass(lead.status_pagamento)}
+          variant="payment"
+        />
+      </div>
+
+      <div className="mt-3 flex items-center justify-between gap-3 border-t border-slate-50 pt-3">
+        <div className="min-w-0 text-xs text-slate-500">
+          <p className="truncate capitalize">{displayOptional(lead.produto)}</p>
+          <p className="mt-0.5">
+            {formatDate(lead.updated_at || lead.created_at)}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onSelect}
+          className="shrink-0 rounded-lg border border-[#1e3a5f]/20 bg-[#1e3a5f]/5 px-3 py-1.5 text-xs font-semibold text-[#1e3a5f] transition hover:bg-[#1e3a5f]/10"
+        >
+          Detalhes
+        </button>
+      </div>
+    </article>
+  );
+}
+
 function StatCard({
   title,
   value,
@@ -432,13 +553,25 @@ function LoadingScreen() {
   );
 }
 
-function DetailRow({ label, value }: { label: string; value: string }) {
+function DetailRow({
+  label,
+  value,
+  muted,
+}: {
+  label: string;
+  value: string;
+  muted?: boolean;
+}) {
   return (
     <div>
       <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">
         {label}
       </dt>
-      <dd className="mt-1 break-words text-sm text-slate-800">{value}</dd>
+      <dd
+        className={`mt-1 break-words text-sm ${muted ? 'italic text-slate-400' : 'text-slate-800'}`}
+      >
+        {value}
+      </dd>
     </div>
   );
 }
@@ -482,7 +615,11 @@ function LeadDetailPanel({
             <DetailRow label="ID da sessão" value={lead.id} />
             <DetailRow label="Nome" value={displayNome(lead.nome)} />
             <DetailRow label="E-mail" value={displayOptional(lead.email)} />
-            <DetailRow label="Telefone" value={displayTelefone(lead.telefone)} />
+            <DetailRow
+              label="Telefone"
+              value={displayTelefone(lead.telefone)}
+              muted={!phoneOk}
+            />
             <DetailRow label="Produto" value={displayOptional(lead.produto)} />
             <DetailRow
               label="Tipo de benefício"
@@ -546,9 +683,18 @@ function LeadDetailPanel({
                   href={whatsAppUrl(lead.telefone)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex w-full items-center justify-center rounded-xl bg-emerald-600 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
                 >
-                  Abrir WhatsApp
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="h-4 w-4"
+                    aria-hidden
+                  >
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.884 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                  </svg>
+                  WhatsApp
                 </a>
               </>
             )}
@@ -585,6 +731,13 @@ export default function AdminPage() {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const dataRef = useRef<DashboardData | null>(null);
   dataRef.current = data;
+
+  const clearFilters = useCallback(() => {
+    setSearch('');
+    setPaymentFilter('all');
+    setProductFilter('all');
+    setBenefitFilter('all');
+  }, []);
 
   const clearSession = useCallback(() => {
     localStorage.removeItem(ADMIN_SESSION_KEY);
@@ -886,94 +1039,106 @@ export default function AdminPage() {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[960px] text-left text-sm">
-              <thead>
-                <tr className="border-b border-slate-100 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  <th className="px-6 py-3">Contato</th>
-                  <th className="px-4 py-3">Produto</th>
-                  <th className="px-4 py-3">Tipo de benefício</th>
-                  <th className="px-4 py-3">Funil</th>
-                  <th className="px-4 py-3">Pagamento</th>
-                  <th className="px-4 py-3">Valor</th>
-                  <th className="px-4 py-3">Origem</th>
-                  <th className="px-4 py-3">Atualizado</th>
-                  <th className="px-6 py-3">Ação</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredLeads.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={9}
-                      className="px-6 py-12 text-center text-slate-400"
-                    >
-                      Nenhum lead encontrado com os filtros atuais.
-                    </td>
-                  </tr>
-                ) : (
-                  filteredLeads.map((lead) => (
-                    <tr
-                      key={lead.id}
-                      className="border-b border-slate-50 transition hover:bg-slate-50/80"
-                    >
-                      <td className="px-6 py-4">
-                        <p className="font-medium text-slate-900">
-                          {displayNome(lead.nome)}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          {displayOptional(lead.email)}
-                        </p>
-                        <p className="text-xs text-slate-400">
-                          {displayTelefone(lead.telefone)}
-                        </p>
-                      </td>
-                      <td className="px-4 py-4 text-slate-700">
-                        {displayOptional(lead.produto)}
-                      </td>
-                      <td className="px-4 py-4">
-                        <BenefitBadge beneficio={lead.tipo_beneficio} />
-                      </td>
-                      <td className="px-4 py-4">
-                        <StatusBadge
-                          label={lead.status_funil || '—'}
-                          className={funnelBadgeClass(lead.status_funil)}
-                          variant="funnel"
-                        />
-                      </td>
-                      <td className="px-4 py-4">
-                        <StatusBadge
-                          label={lead.status_pagamento}
-                          className={paymentBadgeClass(lead.status_pagamento)}
-                          variant="payment"
-                        />
-                      </td>
-                      <td className="px-4 py-4 font-medium text-slate-800">
-                        {lead.valor_centavos > 0
-                          ? formatMoney(lead.valor_centavos)
-                          : '—'}
-                      </td>
-                      <td className="px-4 py-4 capitalize text-slate-500">
-                        {displayOptional(lead.origem)}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-4 text-slate-500">
-                        {formatDate(lead.updated_at || lead.created_at)}
-                      </td>
-                      <td className="px-6 py-4">
-                        <button
-                          type="button"
-                          onClick={() => setSelectedLead(lead)}
-                          className="rounded-lg border border-[#1e3a5f]/20 bg-[#1e3a5f]/5 px-3 py-1.5 text-xs font-semibold text-[#1e3a5f] transition hover:bg-[#1e3a5f]/10"
-                        >
-                          Detalhes
-                        </button>
-                      </td>
+          {filteredLeads.length === 0 ? (
+            <LeadsEmptyState
+              totalLeads={data.leads.length}
+              onClearFilters={clearFilters}
+            />
+          ) : (
+            <>
+              <div className="space-y-3 p-4 md:hidden">
+                {filteredLeads.map((lead) => (
+                  <LeadCard
+                    key={lead.id}
+                    lead={lead}
+                    onSelect={() => setSelectedLead(lead)}
+                  />
+                ))}
+              </div>
+
+              <div className="hidden overflow-x-auto md:block">
+                <table className="w-full min-w-[960px] text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-100 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      <th className="px-6 py-3">Contato</th>
+                      <th className="px-4 py-3">Produto</th>
+                      <th className="px-4 py-3">Tipo de benefício</th>
+                      <th className="px-4 py-3">Funil</th>
+                      <th className="px-4 py-3">Pagamento</th>
+                      <th className="px-4 py-3">Valor</th>
+                      <th className="px-4 py-3">Origem</th>
+                      <th className="px-4 py-3">Atualizado</th>
+                      <th className="px-6 py-3">Ação</th>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                  </thead>
+                  <tbody>
+                    {filteredLeads.map((lead) => (
+                      <tr
+                        key={lead.id}
+                        className="border-b border-slate-50 transition hover:bg-slate-50/80"
+                      >
+                        <td className="px-6 py-4">
+                          <p className="font-medium text-slate-900">
+                            {displayNome(lead.nome)}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            {displayOptional(lead.email)}
+                          </p>
+                          <p
+                            className={`text-xs ${hasTelefone(lead.telefone) ? 'text-slate-400' : 'italic text-slate-400'}`}
+                          >
+                            {displayTelefone(lead.telefone)}
+                          </p>
+                        </td>
+                        <td className="px-4 py-4 text-slate-700">
+                          {displayOptional(lead.produto)}
+                        </td>
+                        <td className="px-4 py-4">
+                          <BenefitBadge beneficio={lead.tipo_beneficio} />
+                        </td>
+                        <td className="px-4 py-4">
+                          <StatusBadge
+                            label={lead.status_funil || '—'}
+                            className={funnelBadgeClass(lead.status_funil)}
+                            variant="funnel"
+                          />
+                        </td>
+                        <td className="px-4 py-4">
+                          <StatusBadge
+                            label={lead.status_pagamento}
+                            className={paymentBadgeClass(
+                              lead.status_pagamento
+                            )}
+                            variant="payment"
+                          />
+                        </td>
+                        <td className="px-4 py-4 font-medium text-slate-800">
+                          {lead.valor_centavos > 0
+                            ? formatMoney(lead.valor_centavos)
+                            : '—'}
+                        </td>
+                        <td className="px-4 py-4 capitalize text-slate-500">
+                          {displayOptional(lead.origem)}
+                        </td>
+                        <td className="whitespace-nowrap px-4 py-4 text-slate-500">
+                          {formatDate(lead.updated_at || lead.created_at)}
+                        </td>
+                        <td className="px-6 py-4">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedLead(lead)}
+                            className="rounded-lg border border-[#1e3a5f]/20 bg-[#1e3a5f]/5 px-3 py-1.5 text-xs font-semibold text-[#1e3a5f] transition hover:bg-[#1e3a5f]/10"
+                          >
+                            Detalhes
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
         </section>
 
         {fetchError && loadState === 'success' && (
