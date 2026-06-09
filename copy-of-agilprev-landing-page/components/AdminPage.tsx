@@ -274,6 +274,158 @@ function benefitBadgeClass(beneficio: string): string {
   return colorByKind[kind];
 }
 
+interface BenefitGroupStats {
+  label: string;
+  leads: number;
+  payments: number;
+  revenueCents: number;
+}
+
+function computeBenefitStats(leads: Lead[]): BenefitGroupStats[] {
+  const map = new Map<string, BenefitGroupStats>();
+
+  for (const lead of leads) {
+    const label = displayBeneficio(lead.tipo_beneficio);
+    const entry = map.get(label) ?? {
+      label,
+      leads: 0,
+      payments: 0,
+      revenueCents: 0,
+    };
+
+    entry.leads += 1;
+    if (isPaid(lead.status_pagamento)) {
+      entry.payments += 1;
+      entry.revenueCents += Number(lead.valor_centavos) || 0;
+    }
+
+    map.set(label, entry);
+  }
+
+  return Array.from(map.values()).sort((a, b) => {
+    if (b.leads !== a.leads) return b.leads - a.leads;
+    return a.label.localeCompare(b.label, 'pt-BR');
+  });
+}
+
+function BenefitSummarySection({ leads }: { leads: Lead[] }) {
+  const stats = useMemo(() => computeBenefitStats(leads), [leads]);
+  const maxLeads = stats[0]?.leads ?? 0;
+
+  return (
+    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="border-b border-slate-100 p-6">
+        <h2 className="text-lg font-bold text-[#1e3a5f]">
+          Resumo por tipo de benefício
+        </h2>
+        <p className="mt-1 text-sm text-slate-500">
+          Distribuição de leads, pagamentos e faturamento com base nos dados
+          atuais
+        </p>
+      </div>
+
+      {stats.length === 0 ? (
+        <div className="px-6 py-12 text-center text-sm text-slate-400">
+          Nenhum dado de benefício disponível ainda.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 p-6 lg:grid-cols-3">
+          <div className="overflow-x-auto lg:col-span-2">
+            <table className="w-full min-w-[480px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-slate-100 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <th className="pb-3 pr-4">Tipo de benefício</th>
+                  <th className="pb-3 pr-4 text-right">Leads</th>
+                  <th className="pb-3 pr-4 text-right">Pagamentos</th>
+                  <th className="pb-3 text-right">Faturamento</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.map((row) => (
+                  <tr
+                    key={row.label}
+                    className="border-b border-slate-50 last:border-0"
+                  >
+                    <td className="py-3 pr-4 font-medium text-slate-800">
+                      {row.label}
+                    </td>
+                    <td className="py-3 pr-4 text-right tabular-nums text-slate-700">
+                      {row.leads}
+                    </td>
+                    <td className="py-3 pr-4 text-right tabular-nums text-slate-700">
+                      {row.payments}
+                    </td>
+                    <td className="py-3 text-right tabular-nums font-medium text-slate-800">
+                      {row.revenueCents > 0
+                        ? formatMoney(row.revenueCents)
+                        : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr className="border-t border-slate-100 bg-slate-50/80 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <td className="py-3 pr-4">Total</td>
+                  <td className="py-3 pr-4 text-right tabular-nums text-[#1e3a5f]">
+                    {stats.reduce((sum, r) => sum + r.leads, 0)}
+                  </td>
+                  <td className="py-3 pr-4 text-right tabular-nums text-[#1e3a5f]">
+                    {stats.reduce((sum, r) => sum + r.payments, 0)}
+                  </td>
+                  <td className="py-3 text-right tabular-nums text-[#1e3a5f]">
+                    {formatMoney(
+                      stats.reduce((sum, r) => sum + r.revenueCents, 0)
+                    )}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-5">
+            <h3 className="text-sm font-bold text-[#1e3a5f]">
+              Benefícios mais procurados
+            </h3>
+            <p className="mt-1 text-xs text-slate-500">
+              Ranking por volume de leads
+            </p>
+            <ol className="mt-4 space-y-3">
+              {stats.map((row, index) => {
+                const barWidth =
+                  maxLeads > 0 ? Math.round((row.leads / maxLeads) * 100) : 0;
+
+                return (
+                  <li key={row.label}>
+                    <div className="flex items-center justify-between gap-2 text-sm">
+                      <span className="flex min-w-0 items-center gap-2">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#1e3a5f]/10 text-xs font-bold text-[#1e3a5f]">
+                          {index + 1}
+                        </span>
+                        <span className="truncate font-medium text-slate-800">
+                          {row.label}
+                        </span>
+                      </span>
+                      <span className="shrink-0 tabular-nums text-xs font-semibold text-slate-600">
+                        {row.leads} lead{row.leads === 1 ? '' : 's'}
+                      </span>
+                    </div>
+                    <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-200">
+                      <div
+                        className="h-full rounded-full bg-[#1e3a5f]/70 transition-all"
+                        style={{ width: `${barWidth}%` }}
+                      />
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 function whatsAppUrl(telefone: string): string {
   const digits = telefone.replace(/\D/g, '');
   const withCountry = digits.startsWith('55') ? digits : `55${digits}`;
@@ -979,6 +1131,8 @@ export default function AdminPage() {
             accent="violet"
           />
         </section>
+
+        <BenefitSummarySection leads={data.leads} />
 
         <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="border-b border-slate-100 p-6">
