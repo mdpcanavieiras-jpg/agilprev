@@ -234,9 +234,44 @@ function paymentBadgeClass(status: string): string {
   return 'bg-slate-100 text-slate-700';
 }
 
-function formatStatusLabel(status: string): string {
+function formatPaymentStatusLabel(status: string): string {
   if (!status || isSemPagamento(status)) return 'Sem pagamento';
+  const s = norm(status);
+  if (s === 'paid' || isPaid(status)) return 'Pago';
+  if (s === 'pending') return 'Pendente';
   return status.replace(/_/g, ' ');
+}
+
+function formatFunnelStatusLabel(status: string): string {
+  if (!status || status === '—') return '—';
+  return status.replace(/_/g, ' ');
+}
+
+function benefitBadgeClass(beneficio: string): string {
+  if (!beneficio?.trim()) return 'bg-slate-100 text-slate-500';
+
+  const colorByKind: Record<Exclude<BenefitFilter, 'all'>, string> = {
+    aposentadoria: 'bg-blue-100 text-blue-800',
+    'auxilio-doenca': 'bg-amber-100 text-amber-800',
+    pensao: 'bg-purple-100 text-purple-800',
+    maternidade: 'bg-pink-100 text-pink-800',
+    'bpc-loas': 'bg-teal-100 text-teal-800',
+    revisao: 'bg-indigo-100 text-indigo-800',
+    outro: 'bg-slate-100 text-slate-700',
+  };
+
+  const kinds: Exclude<BenefitFilter, 'all'>[] = [
+    'aposentadoria',
+    'auxilio-doenca',
+    'pensao',
+    'maternidade',
+    'bpc-loas',
+    'revisao',
+  ];
+
+  const kind =
+    kinds.find((k) => matchesBenefitFilter(beneficio, k)) ?? 'outro';
+  return colorByKind[kind];
 }
 
 function whatsAppUrl(telefone: string): string {
@@ -254,12 +289,38 @@ async function copyToClipboard(text: string): Promise<boolean> {
   }
 }
 
-function StatusBadge({ label, className }: { label: string; className: string }) {
+function StatusBadge({
+  label,
+  className,
+  variant = 'funnel',
+}: {
+  label: string;
+  className: string;
+  variant?: 'funnel' | 'payment';
+}) {
+  const text =
+    variant === 'payment'
+      ? formatPaymentStatusLabel(label)
+      : formatFunnelStatusLabel(label);
+
   return (
     <span
       className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${className}`}
     >
-      {formatStatusLabel(label)}
+      {text}
+    </span>
+  );
+}
+
+function BenefitBadge({ beneficio }: { beneficio: string }) {
+  const label = displayBeneficio(beneficio);
+
+  return (
+    <span
+      className={`inline-block max-w-[160px] truncate rounded-full px-2.5 py-0.5 text-xs font-semibold ${benefitBadgeClass(beneficio)}`}
+      title={label}
+    >
+      {label}
     </span>
   );
 }
@@ -438,7 +499,7 @@ function LeadDetailPanel({
             />
             <DetailRow
               label="Status do pagamento"
-              value={formatStatusLabel(lead.status_pagamento)}
+              value={formatPaymentStatusLabel(lead.status_pagamento)}
             />
             <DetailRow
               label="Valor"
@@ -831,7 +892,7 @@ export default function AdminPage() {
                 <tr className="border-b border-slate-100 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
                   <th className="px-6 py-3">Contato</th>
                   <th className="px-4 py-3">Produto</th>
-                  <th className="px-4 py-3">Benefício</th>
+                  <th className="px-4 py-3">Tipo de benefício</th>
                   <th className="px-4 py-3">Funil</th>
                   <th className="px-4 py-3">Pagamento</th>
                   <th className="px-4 py-3">Valor</th>
@@ -870,19 +931,21 @@ export default function AdminPage() {
                       <td className="px-4 py-4 text-slate-700">
                         {displayOptional(lead.produto)}
                       </td>
-                      <td className="max-w-[120px] truncate px-4 py-4 text-slate-600">
-                        {displayBeneficio(lead.tipo_beneficio)}
+                      <td className="px-4 py-4">
+                        <BenefitBadge beneficio={lead.tipo_beneficio} />
                       </td>
                       <td className="px-4 py-4">
                         <StatusBadge
                           label={lead.status_funil || '—'}
                           className={funnelBadgeClass(lead.status_funil)}
+                          variant="funnel"
                         />
                       </td>
                       <td className="px-4 py-4">
                         <StatusBadge
                           label={lead.status_pagamento}
                           className={paymentBadgeClass(lead.status_pagamento)}
+                          variant="payment"
                         />
                       </td>
                       <td className="px-4 py-4 font-medium text-slate-800">
