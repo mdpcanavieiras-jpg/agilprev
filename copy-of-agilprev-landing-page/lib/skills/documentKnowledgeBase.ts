@@ -249,7 +249,15 @@ export const DOCUMENT_SKILLS = {
         'guardar protocolo do pedido administrativo',
         'acompanhar o andamento pelo Meu INSS',
         'avaliar recurso administrativo em caso de indeferimento'
-      ]
+      ],
+
+      cuidadosImportantes: [
+        'não afirmar que houve parto se o usuário não informou',
+        'não afirmar que a criança nasceu se isso não foi confirmado',
+        'não presumir vínculo de emprego, MEI, desemprego ou segurada especial',
+        'não presumir documentação já apresentada ao INSS',
+        'usar linguagem neutra quando faltarem informações essenciais'
+      ],
     },
 
     beneficioNegado: {

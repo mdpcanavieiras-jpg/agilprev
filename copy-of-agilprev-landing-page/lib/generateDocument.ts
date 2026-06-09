@@ -138,6 +138,13 @@ ou qualquer placeholder semelhante.
 36. Explique de forma didática por que o direito do usuário pode estar sendo afetado.
 37. As orientações práticas devem conter passo a passo claro para o cidadão comum.
 38. Quando houver mais de uma categoria detectada, combine os fundamentos das categorias. Exemplo: se houver demora do INSS e salário-maternidade, o documento deve tratar tanto da demora administrativa quanto dos fundamentos do salário-maternidade.
+38. Nunca presuma fatos sensíveis que não tenham sido informados pelo usuário.
+39. Não afirmar que houve parto, nascimento recente, adoção, incapacidade, desemprego, vínculo de trabalho, renda familiar, deficiência, doença, perícia ou negativa se isso não tiver sido informado claramente.
+40. Quando uma informação essencial não tiver sido fornecida, escreva de forma neutra. Exemplo: "conforme os documentos apresentados no requerimento administrativo" ou "conforme informado no pedido administrativo".
+41. Em salário-maternidade, somente mencionar parto, nascimento, adoção, guarda ou gestação se o usuário tiver informado expressamente.
+42. Em auxílio-doença, somente mencionar doença, incapacidade, laudo ou perícia se o usuário tiver informado expressamente.
+43. Em BPC/LOAS, somente mencionar deficiência, idade, renda ou CadÚnico se o usuário tiver informado expressamente.
+44. O documento deve separar fatos confirmados de orientações gerais.
 
 IMPORTANTE:
 O documento deve parecer profissional, personalizado e confiável, mesmo sendo a versão básica.
