@@ -29,8 +29,8 @@ const Header: React.FC<HeaderProps> = ({ onOpenModal }) => {
     { name: 'FAQ', href: '#faq' },
   ];
 
-  const LOGO_URL = "https://horizons-cdn.hostinger.com/195324a5-5ad8-4c91-83fb-8e15c14e8dfe/94ac8ec0e4dff84bff0c6eccb37a8b58.png";
-
+  const LOGO_URL = "/agilprev-watermark.png"
+  
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (!href.startsWith('#')) return;
     e.preventDefault();
