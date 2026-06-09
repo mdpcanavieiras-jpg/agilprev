@@ -1593,11 +1593,12 @@ export default function AdminPage() {
             <>
               <div className="space-y-3 p-4 md:hidden">
                 {filteredLeads.map((lead) => (
-                  <LeadCard
-                    key={lead.id}
-                    lead={lead}
-                    onSelect={() => setSelectedLead(lead)}
-                  />
+                  <React.Fragment key={lead.id}>
+                    <LeadCard
+                      lead={lead}
+                      onSelect={() => setSelectedLead(lead)}
+                    />
+                  </React.Fragment>
                 ))}
               </div>
 
