@@ -88,6 +88,35 @@ Caso uma skill tenha sido identificada, adapte o documento ao contexto específi
 ===CONVERSA COMPLETA===
 ${summary}
 
+===USO DAS RESPOSTAS ESPECÍFICAS===
+Analise a conversa completa e identifique respostas específicas dadas pelo usuário sobre o benefício.
+
+Se houver respostas sobre:
+- parto;
+- gestação;
+- adoção;
+- data do parto;
+- previsão do parto;
+- doença;
+- laudo médico;
+- perícia;
+- CadÚnico;
+- idade;
+- deficiência;
+- motivo da negativa;
+- situação do pedido;
+
+essas informações devem aparecer obrigatoriamente na seção DOS FATOS.
+
+Use apenas informações que o usuário informou claramente.
+
+Se uma informação específica não foi respondida, não invente e não mencione como fato confirmado.
+
+Quando faltar informação, escreva de forma neutra:
+"conforme informações constantes no pedido administrativo"
+ou
+"conforme documentação a ser apresentada pelo requerente".
+
 ===INSTRUÇÕES===
 Com base na conversa acima e na base de conhecimento, gere o documento previdenciário FORMAL, ÚTIL e PERSONALIZADO para o caso do usuário.
 
@@ -145,6 +174,10 @@ ou qualquer placeholder semelhante.
 42. Em auxílio-doença, somente mencionar doença, incapacidade, laudo ou perícia se o usuário tiver informado expressamente.
 43. Em BPC/LOAS, somente mencionar deficiência, idade, renda ou CadÚnico se o usuário tiver informado expressamente.
 44. O documento deve separar fatos confirmados de orientações gerais.
+45. As respostas específicas dadas pelo usuário durante o chat devem aparecer obrigatoriamente na seção DOS FATOS, quando forem relevantes ao caso.
+46. Se o usuário informou que é parto, gestação, adoção, doença, perícia, CadÚnico, deficiência, idade, negativa ou demora, essas informações devem ser usadas como fatos confirmados.
+47. Se o usuário não respondeu uma pergunta específica, não invente. Apenas não mencione esse fato como confirmado.
+48. A seção DOS FATOS deve refletir a conversa real, não apenas a categoria detectada.
 
 IMPORTANTE:
 O documento deve parecer profissional, personalizado e confiável, mesmo sendo a versão básica.

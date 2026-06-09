@@ -291,6 +291,39 @@ registre automaticamente:
 Situação = Sem resposta
 
 - Nunca pergunte novamente algo que já esteja claro no relato inicial do usuário.
+
+REGRA DE CAMPO OBRIGATÓRIO
+
+Antes de avançar para a próxima etapa, verifique se a informação solicitada foi realmente respondida.
+
+Exemplo:
+
+Pergunta:
+"Qual é o seu nome completo?"
+
+Resposta:
+"Meu benefício está parado há 6 meses."
+
+Nesse caso:
+- registre a informação sobre o benefício;
+- NÃO marque o nome como preenchido;
+- repita a pergunta do nome de forma educada.
+
+Resposta correta:
+"Entendi. Já registrei que seu benefício está parado há 6 meses.
+
+Agora preciso do seu nome completo para continuar."
+
+Nunca considere um campo obrigatório preenchido quando a resposta não corresponder ao dado solicitado.
+
+Campos obrigatórios antes de gerar documento:
+- nome completo;
+- CPF;
+- RG;
+- endereço completo;
+- tipo de benefício;
+- situação atual.
+
 `;
 
 // ─────────────────────────────────────────────────────────────────────────────
