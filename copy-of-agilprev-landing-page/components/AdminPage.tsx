@@ -2,6 +2,9 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 const API_URL = 'https://agilprev-production.up.railway.app';
 const ADMIN_SESSION_KEY = 'agilprev_admin_auth';
+const LOGO_URL = '/agilprev-watermark.png';
+
+type NavSection = 'visao-geral' | 'relatorios' | 'leads';
 
 interface Lead {
   id: string;
@@ -72,6 +75,22 @@ function displayOptional(value: string): string {
 function hasTelefone(telefone: string): boolean {
   const digits = telefone?.replace(/\D/g, '') ?? '';
   return digits.length >= 10;
+}
+
+function getInitials(nome: string): string {
+  const label = displayNome(nome);
+  if (label === 'Lead sem nome') return '?';
+  const parts = label.split(/\s+/).filter(Boolean);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function scrollToSection(sectionId: string, onDone?: () => void) {
+  document.getElementById(sectionId)?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start',
+  });
+  onDone?.();
 }
 
 function normalizeDashboard(raw: Record<string, unknown>): DashboardData {
@@ -313,8 +332,11 @@ function BenefitSummarySection({ leads }: { leads: Lead[] }) {
   const maxLeads = stats[0]?.leads ?? 0;
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="border-b border-slate-100 p-6">
+    <section
+      id="relatorios"
+      className="scroll-mt-24 overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-sm"
+    >
+      <div className="border-b border-slate-100 px-6 py-5">
         <h2 className="text-lg font-bold text-[#1e3a5f]">
           Resumo por tipo de benefício
         </h2>
@@ -547,18 +569,21 @@ function LeadCard({
   onSelect: () => void;
 }) {
   return (
-    <article className="rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
+    <article className="rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="font-medium text-slate-900">{displayNome(lead.nome)}</p>
-          <p className="mt-0.5 truncate text-xs text-slate-500">
-            {displayOptional(lead.email)}
-          </p>
-          <p
-            className={`mt-0.5 text-xs ${hasTelefone(lead.telefone) ? 'text-slate-400' : 'italic text-slate-400'}`}
-          >
-            {displayTelefone(lead.telefone)}
-          </p>
+        <div className="flex min-w-0 items-start gap-3">
+          <ContactAvatar nome={lead.nome} size="sm" />
+          <div className="min-w-0">
+            <p className="font-medium text-slate-900">{displayNome(lead.nome)}</p>
+            <p className="mt-0.5 truncate text-xs text-slate-500">
+              {displayOptional(lead.email)}
+            </p>
+            <p
+              className={`mt-0.5 text-xs ${hasTelefone(lead.telefone) ? 'text-slate-400' : 'italic text-slate-400'}`}
+            >
+              {displayTelefone(lead.telefone)}
+            </p>
+          </div>
         </div>
         <p className="shrink-0 text-sm font-semibold text-slate-800">
           {lead.valor_centavos > 0 ? formatMoney(lead.valor_centavos) : '—'}
@@ -598,35 +623,377 @@ function LeadCard({
   );
 }
 
-function StatCard({
-  title,
-  value,
-  subtitle,
-  accent,
-}: {
+type StatCardProps = {
   title: string;
   value: string | number;
   subtitle?: string;
   accent: 'blue' | 'green' | 'lime' | 'slate' | 'amber' | 'violet';
+};
+
+function ContactAvatar({
+  nome,
+  size = 'md',
+  variant = 'light',
+}: {
+  nome: string;
+  size?: 'sm' | 'md' | 'lg';
+  variant?: 'light' | 'dark';
 }) {
-  const accentMap: Record<string, string> = {
-    blue: 'border-l-[#1e3a5f]',
-    green: 'border-l-emerald-500',
-    lime: 'border-l-lime-500',
-    slate: 'border-l-slate-400',
-    amber: 'border-l-amber-500',
-    violet: 'border-l-violet-500',
+  const sizeClass =
+    size === 'sm'
+      ? 'h-9 w-9 text-xs'
+      : size === 'lg'
+        ? 'h-12 w-12 text-base'
+        : 'h-10 w-10 text-sm';
+
+  const colorClass =
+    variant === 'dark'
+      ? 'bg-white/15 text-white'
+      : 'bg-[#2563EB]/10 text-[#1e3a5f]';
+
+  return (
+    <div
+      className={`flex shrink-0 items-center justify-center rounded-full font-bold ${colorClass} ${sizeClass}`}
+      aria-hidden
+    >
+      {getInitials(nome)}
+    </div>
+  );
+}
+
+function ContactCell({ lead }: { lead: Lead }) {
+  return (
+    <div className="flex items-center gap-3">
+      <ContactAvatar nome={lead.nome} size="sm" />
+      <div className="min-w-0">
+        <p className="font-medium text-slate-900">{displayNome(lead.nome)}</p>
+        <p className="truncate text-xs text-slate-500">
+          {displayOptional(lead.email)}
+        </p>
+        <p
+          className={`text-xs ${hasTelefone(lead.telefone) ? 'text-slate-400' : 'italic text-slate-400'}`}
+        >
+          {displayTelefone(lead.telefone)}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function StatCardIcon({ accent }: { accent: StatCardProps['accent'] }) {
+  const bgMap: Record<StatCardProps['accent'], string> = {
+    blue: 'bg-[#2563EB]/10 text-[#2563EB]',
+    green: 'bg-emerald-100 text-emerald-600',
+    lime: 'bg-lime-100 text-lime-600',
+    slate: 'bg-slate-100 text-slate-600',
+    amber: 'bg-amber-100 text-amber-600',
+    violet: 'bg-violet-100 text-violet-600',
+  };
+
+  const paths: Record<StatCardProps['accent'], React.ReactNode> = {
+    blue: (
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
+      />
+    ),
+    green: (
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    ),
+    lime: (
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"
+      />
+    ),
+    slate: (
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    ),
+    amber: (
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    ),
+    violet: (
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"
+      />
+    ),
   };
 
   return (
     <div
-      className={`rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm border-l-4 ${accentMap[accent]}`}
+      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${bgMap[accent]}`}
     >
-      <p className="text-sm font-medium text-slate-500">{title}</p>
-      <p className="mt-2 text-2xl font-bold tracking-tight text-[#1e3a5f] sm:text-3xl">
-        {value}
-      </p>
-      {subtitle && <p className="mt-1 text-xs text-slate-400">{subtitle}</p>}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-5 w-5"
+        aria-hidden
+      >
+        {paths[accent]}
+      </svg>
+    </div>
+  );
+}
+
+function StatCard({ title, value, subtitle, accent }: StatCardProps) {
+  return (
+    <div className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium text-slate-500">{title}</p>
+          <p className="mt-2 text-2xl font-bold tracking-tight text-[#1e3a5f] sm:text-[1.75rem]">
+            {value}
+          </p>
+          {subtitle && (
+            <p className="mt-1.5 text-xs text-slate-400">{subtitle}</p>
+          )}
+        </div>
+        <StatCardIcon accent={accent} />
+      </div>
+    </div>
+  );
+}
+
+const NAV_ITEMS: {
+  section: NavSection;
+  targetId: string;
+  label: string;
+}[] = [
+  { section: 'visao-geral', targetId: 'visao-geral', label: 'Visão geral' },
+  {
+    section: 'relatorios',
+    targetId: 'relatorios',
+    label: 'Relatórios por benefício',
+  },
+  { section: 'leads', targetId: 'leads', label: 'Leads' },
+];
+
+function AdminSidebar({
+  activeSection,
+  onNavigate,
+  onLogout,
+  mobileOpen,
+  onCloseMobile,
+}: {
+  activeSection: NavSection;
+  onNavigate: (section: NavSection, targetId: string) => void;
+  onLogout: () => void;
+  mobileOpen: boolean;
+  onCloseMobile: () => void;
+}) {
+  return (
+    <aside
+      className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-[#1e3a5f] text-white shadow-xl transition-transform duration-200 lg:translate-x-0 ${
+        mobileOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}
+      aria-label="Navegação principal"
+    >
+      <div className="border-b border-white/10 px-5 py-5">
+        <div className="flex items-center gap-3">
+          <img
+            src={LOGO_URL}
+            alt="Agilprev"
+            className="h-9 w-9 rounded-lg bg-white/10 object-contain p-1"
+          />
+          <div>
+            <p className="text-sm font-bold leading-tight">
+              <span className="text-[#84CC16]">Agil</span>
+              <span className="text-[#3B82F6]">prev</span>
+            </p>
+            <p className="text-[11px] text-white/60">Painel Admin</p>
+          </div>
+        </div>
+      </div>
+
+      <nav className="flex-1 space-y-1 px-3 py-4">
+        {NAV_ITEMS.map((item) => {
+          const active = activeSection === item.section;
+          return (
+            <button
+              key={item.section}
+              type="button"
+              onClick={() => onNavigate(item.section, item.targetId)}
+              className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition ${
+                active
+                  ? 'bg-white/15 text-white shadow-sm'
+                  : 'text-white/70 hover:bg-white/10 hover:text-white'
+              }`}
+            >
+              <span
+                className={`h-2 w-2 shrink-0 rounded-full ${active ? 'bg-[#22C55E]' : 'bg-white/30'}`}
+                aria-hidden
+              />
+              {item.label}
+            </button>
+          );
+        })}
+      </nav>
+
+      <div className="border-t border-white/10 p-4">
+        <button
+          type="button"
+          onClick={() => {
+            onCloseMobile();
+            onLogout();
+          }}
+          className="flex w-full items-center justify-center rounded-xl border border-white/20 px-4 py-2.5 text-sm font-medium text-white/90 transition hover:bg-white/10"
+        >
+          Sair
+        </button>
+      </div>
+    </aside>
+  );
+}
+
+function AdminTopBar({
+  lastUpdated,
+  loadState,
+  onRefresh,
+  onLogout,
+  onMenuClick,
+}: {
+  lastUpdated: Date | null;
+  loadState: LoadState;
+  onRefresh: () => void;
+  onLogout: () => void;
+  onMenuClick: () => void;
+}) {
+  return (
+    <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 backdrop-blur-sm">
+      <div className="flex flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <div className="flex min-w-0 items-start gap-3">
+          <button
+            type="button"
+            onClick={onMenuClick}
+            className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition hover:bg-slate-50 lg:hidden"
+            aria-label="Abrir menu"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="h-5 w-5"
+              aria-hidden
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+              />
+            </svg>
+          </button>
+          <div className="min-w-0">
+            <h1 className="truncate text-lg font-bold text-[#1e3a5f] sm:text-xl">
+              Painel Administrativo
+            </h1>
+            <p className="mt-0.5 text-sm text-slate-500">
+              Gestão de leads, pagamentos e conversões
+            </p>
+            {lastUpdated && (
+              <p className="mt-1 text-xs text-slate-400">
+                Atualizado em {formatDate(lastUpdated.toISOString())}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={onRefresh}
+            disabled={loadState === 'loading'}
+            className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-[#1e3a5f] transition hover:bg-slate-50 disabled:opacity-50"
+          >
+            {loadState === 'loading' ? 'Atualizando…' : 'Atualizar'}
+          </button>
+          <button
+            type="button"
+            onClick={onLogout}
+            className="hidden rounded-xl bg-[#1e3a5f] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#162d4a] sm:inline-flex"
+          >
+            Sair
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function AdminLayout({
+  children,
+  lastUpdated,
+  loadState,
+  onRefresh,
+  onLogout,
+  activeSection,
+  onNavigate,
+}: {
+  children: React.ReactNode;
+  lastUpdated: Date | null;
+  loadState: LoadState;
+  onRefresh: () => void;
+  onLogout: () => void;
+  activeSection: NavSection;
+  onNavigate: (section: NavSection, targetId: string) => void;
+}) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleNavigate = (section: NavSection, targetId: string) => {
+    onNavigate(section, targetId);
+    scrollToSection(targetId, () => setSidebarOpen(false));
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          aria-label="Fechar menu"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      <AdminSidebar
+        activeSection={activeSection}
+        onNavigate={handleNavigate}
+        onLogout={onLogout}
+        mobileOpen={sidebarOpen}
+        onCloseMobile={() => setSidebarOpen(false)}
+      />
+
+      <div className="lg:pl-64">
+        <AdminTopBar
+          lastUpdated={lastUpdated}
+          loadState={loadState}
+          onRefresh={onRefresh}
+          onLogout={onLogout}
+          onMenuClick={() => setSidebarOpen(true)}
+        />
+        <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+          {children}
+        </div>
+      </div>
     </div>
   );
 }
@@ -646,6 +1013,11 @@ function AdminLogin({
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#1e3a5f] via-[#1e3a5f] to-[#0f2744] px-4">
       <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white p-8 shadow-2xl">
         <div className="mb-6 text-center">
+          <img
+            src={LOGO_URL}
+            alt="Agilprev"
+            className="mx-auto mb-4 h-14 w-14 rounded-2xl bg-slate-50 object-contain p-2"
+          />
           <h1 className="text-xl font-bold text-[#1e3a5f]">
             Acesso Restrito{' '}
             <span className="text-logo-green">Agil</span>
@@ -697,7 +1069,12 @@ function AdminLogin({
 function LoadingScreen() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50">
-      <div className="h-12 w-12 animate-spin rounded-full border-4 border-slate-200 border-t-[#1e3a5f]" />
+      <img
+        src={LOGO_URL}
+        alt="Agilprev"
+        className="mb-6 h-12 w-12 rounded-xl bg-white object-contain p-1 shadow-sm"
+      />
+      <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-[#1e3a5f]" />
       <p className="mt-4 text-sm font-medium text-slate-600">
         Carregando painel administrativo…
       </p>
@@ -756,10 +1133,14 @@ function LeadDetailPanel({
         role="dialog"
         aria-labelledby="lead-detail-title"
       >
-        <div className="flex items-center justify-between border-b border-slate-100 bg-[#1e3a5f] px-6 py-4 text-white">
-          <h2 id="lead-detail-title" className="text-lg font-bold">
-            Detalhes do lead
-          </h2>
+        <div className="flex items-center gap-4 border-b border-white/10 bg-[#1e3a5f] px-6 py-5 text-white">
+          <ContactAvatar nome={lead.nome} size="lg" variant="dark" />
+          <div className="min-w-0">
+            <h2 id="lead-detail-title" className="truncate text-lg font-bold">
+              {displayNome(lead.nome)}
+            </h2>
+            <p className="text-sm text-white/70">Detalhes do lead</p>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-6">
@@ -881,6 +1262,7 @@ export default function AdminPage() {
   const [productFilter, setProductFilter] = useState<ProductFilter>('all');
   const [benefitFilter, setBenefitFilter] = useState<BenefitFilter>('all');
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [activeSection, setActiveSection] = useState<NavSection>('visao-geral');
   const dataRef = useRef<DashboardData | null>(null);
   dataRef.current = data;
 
@@ -1052,48 +1434,18 @@ export default function AdminPage() {
   const { stats } = data;
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white shadow-sm">
-        <div className="mx-auto max-w-7xl px-4 py-5 sm:px-8">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <h1 className="text-xl font-bold text-[#1e3a5f] sm:text-2xl">
-                <span className="text-logo-green">Agil</span>
-                <span className="text-logo-blue">prev</span>
-                <span className="text-[#1e3a5f]"> — Painel Administrativo</span>
-              </h1>
-              <p className="mt-1 text-sm text-slate-500">
-                Gestão de leads, pagamentos e conversões
-              </p>
-              {lastUpdated && (
-                <p className="mt-1 text-xs text-slate-400">
-                  Atualizado em {formatDate(lastUpdated.toISOString())}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={fetchDashboard}
-                disabled={loadState === 'loading'}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-[#1e3a5f] transition hover:bg-slate-50 disabled:opacity-50"
-              >
-                {loadState === 'loading' ? 'Atualizando…' : 'Atualizar'}
-              </button>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="rounded-xl bg-[#1e3a5f] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#162d4a]"
-              >
-                Sair
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-8">
-        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+    <AdminLayout
+      lastUpdated={lastUpdated}
+      loadState={loadState}
+      onRefresh={fetchDashboard}
+      onLogout={handleLogout}
+      activeSection={activeSection}
+      onNavigate={setActiveSection}
+    >
+        <section
+          id="visao-geral"
+          className="scroll-mt-24 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        >
           <StatCard
             title="Leads totais"
             value={stats.totalSessions}
@@ -1134,62 +1486,101 @@ export default function AdminPage() {
 
         <BenefitSummarySection leads={data.leads} />
 
-        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-100 p-6">
-            <div className="mb-4">
+        <section
+          id="leads"
+          className="scroll-mt-24 overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-sm"
+        >
+          <div className="border-b border-slate-100 px-6 py-5">
+            <div className="mb-5">
               <h2 className="text-lg font-bold text-[#1e3a5f]">Leads</h2>
-              <p className="text-sm text-slate-500">
+              <p className="mt-1 text-sm text-slate-500">
                 {filteredLeads.length} de {data.leads.length} registros
               </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <input
-                type="search"
-                placeholder="Buscar nome, e-mail, telefone, produto, benefício…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="rounded-xl border border-slate-200 px-4 py-2 text-sm outline-none focus:border-[#1e3a5f] focus:ring-2 focus:ring-[#1e3a5f]/20"
-              />
-              <select
-                value={paymentFilter}
-                onChange={(e) =>
-                  setPaymentFilter(e.target.value as PaymentFilter)
-                }
-                className="rounded-xl border border-slate-200 px-4 py-2 text-sm outline-none focus:border-[#1e3a5f]"
-              >
-                <option value="all">Pagamento: todos</option>
-                <option value="paid">Pagamento: paid</option>
-                <option value="pending">Pagamento: pending</option>
-                <option value="sem_pagamento">Pagamento: sem_pagamento</option>
-              </select>
-              <select
-                value={productFilter}
-                onChange={(e) =>
-                  setProductFilter(e.target.value as ProductFilter)
-                }
-                className="rounded-xl border border-slate-200 px-4 py-2 text-sm outline-none focus:border-[#1e3a5f]"
-              >
-                <option value="all">Produto: todos</option>
-                <option value="documento">Produto: documento</option>
-                <option value="premium">Produto: premium</option>
-              </select>
-              <select
-                value={benefitFilter}
-                onChange={(e) =>
-                  setBenefitFilter(e.target.value as BenefitFilter)
-                }
-                className="rounded-xl border border-slate-200 px-4 py-2 text-sm outline-none focus:border-[#1e3a5f]"
-              >
-                <option value="all">Benefício: todos</option>
-                <option value="aposentadoria">Aposentadoria</option>
-                <option value="auxilio-doenca">Auxílio-doença</option>
-                <option value="pensao">Pensão</option>
-                <option value="maternidade">Maternidade</option>
-                <option value="bpc-loas">BPC/LOAS</option>
-                <option value="revisao">Revisão</option>
-                <option value="outro">Outro</option>
-              </select>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div>
+                <label
+                  htmlFor="admin-search"
+                  className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400"
+                >
+                  Busca
+                </label>
+                <input
+                  id="admin-search"
+                  type="search"
+                  placeholder="Nome, e-mail, telefone, produto…"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-[#1e3a5f] focus:ring-2 focus:ring-[#1e3a5f]/20"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="admin-payment-filter"
+                  className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400"
+                >
+                  Pagamento
+                </label>
+                <select
+                  id="admin-payment-filter"
+                  value={paymentFilter}
+                  onChange={(e) =>
+                    setPaymentFilter(e.target.value as PaymentFilter)
+                  }
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-[#1e3a5f]"
+                >
+                  <option value="all">Todos</option>
+                  <option value="paid">Paid</option>
+                  <option value="pending">Pending</option>
+                  <option value="sem_pagamento">Sem pagamento</option>
+                </select>
+              </div>
+              <div>
+                <label
+                  htmlFor="admin-product-filter"
+                  className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400"
+                >
+                  Produto
+                </label>
+                <select
+                  id="admin-product-filter"
+                  value={productFilter}
+                  onChange={(e) =>
+                    setProductFilter(e.target.value as ProductFilter)
+                  }
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-[#1e3a5f]"
+                >
+                  <option value="all">Todos</option>
+                  <option value="documento">Documento</option>
+                  <option value="premium">Premium</option>
+                </select>
+              </div>
+              <div>
+                <label
+                  htmlFor="admin-benefit-filter"
+                  className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400"
+                >
+                  Benefício
+                </label>
+                <select
+                  id="admin-benefit-filter"
+                  value={benefitFilter}
+                  onChange={(e) =>
+                    setBenefitFilter(e.target.value as BenefitFilter)
+                  }
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-[#1e3a5f]"
+                >
+                  <option value="all">Todos</option>
+                  <option value="aposentadoria">Aposentadoria</option>
+                  <option value="auxilio-doenca">Auxílio-doença</option>
+                  <option value="pensao">Pensão</option>
+                  <option value="maternidade">Maternidade</option>
+                  <option value="bpc-loas">BPC/LOAS</option>
+                  <option value="revisao">Revisão</option>
+                  <option value="outro">Outro</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -1213,16 +1604,16 @@ export default function AdminPage() {
               <div className="hidden overflow-x-auto md:block">
                 <table className="w-full min-w-[960px] text-left text-sm">
                   <thead>
-                    <tr className="border-b border-slate-100 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      <th className="px-6 py-3">Contato</th>
-                      <th className="px-4 py-3">Produto</th>
-                      <th className="px-4 py-3">Tipo de benefício</th>
-                      <th className="px-4 py-3">Funil</th>
-                      <th className="px-4 py-3">Pagamento</th>
-                      <th className="px-4 py-3">Valor</th>
-                      <th className="px-4 py-3">Origem</th>
-                      <th className="px-4 py-3">Atualizado</th>
-                      <th className="px-6 py-3">Ação</th>
+                    <tr className="border-b border-slate-100 bg-slate-50/80 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      <th className="px-6 py-3.5">Contato</th>
+                      <th className="px-4 py-3.5">Produto</th>
+                      <th className="px-4 py-3.5">Tipo de benefício</th>
+                      <th className="px-4 py-3.5">Funil</th>
+                      <th className="px-4 py-3.5">Pagamento</th>
+                      <th className="px-4 py-3.5">Valor</th>
+                      <th className="px-4 py-3.5">Origem</th>
+                      <th className="px-4 py-3.5">Atualizado</th>
+                      <th className="px-6 py-3.5">Ação</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1232,17 +1623,7 @@ export default function AdminPage() {
                         className="border-b border-slate-50 transition hover:bg-slate-50/80"
                       >
                         <td className="px-6 py-4">
-                          <p className="font-medium text-slate-900">
-                            {displayNome(lead.nome)}
-                          </p>
-                          <p className="text-xs text-slate-500">
-                            {displayOptional(lead.email)}
-                          </p>
-                          <p
-                            className={`text-xs ${hasTelefone(lead.telefone) ? 'text-slate-400' : 'italic text-slate-400'}`}
-                          >
-                            {displayTelefone(lead.telefone)}
-                          </p>
+                          <ContactCell lead={lead} />
                         </td>
                         <td className="px-4 py-4 text-slate-700">
                           {displayOptional(lead.produto)}
@@ -1300,7 +1681,6 @@ export default function AdminPage() {
             Falha ao atualizar: {fetchError}. Exibindo dados anteriores.
           </p>
         )}
-      </main>
 
       {selectedLead && (
         <LeadDetailPanel
@@ -1308,6 +1688,6 @@ export default function AdminPage() {
           onClose={() => setSelectedLead(null)}
         />
       )}
-    </div>
+    </AdminLayout>
   );
 }
