@@ -288,9 +288,9 @@ await new Promise(r => setTimeout(r, typingDelay));
     if (!lastFailedMessages) return;
     setLoading(true); setIsUnresponsive(false); setLastSentAt(Date.now());
     const typingDelay =
-  text.length < 20
+  lastFailedMessages.length < 20
     ? 1500
-    : text.length < 80
+    : lastFailedMessages.length < 80
     ? 2500
     : 4000;
 

@@ -40,6 +40,37 @@ function trackEvent(eventName: string, params = {}) {
     window.gtag("event", eventName, params);
   }
 }
+
+function detectBenefitFromConversation(text: string): string {
+  const normalized = text.toLowerCase();
+
+  if (normalized.includes('auxílio-doença') || normalized.includes('auxilio doença') || normalized.includes('incapacidade') || normalized.includes('perícia')) {
+    return 'auxilio_doenca';
+  }
+
+  if (normalized.includes('salário-maternidade') || normalized.includes('salario maternidade') || normalized.includes('maternidade') || normalized.includes('gestante') || normalized.includes('parto')) {
+    return 'salario_maternidade';
+  }
+
+  if (normalized.includes('bpc') || normalized.includes('loas') || normalized.includes('benefício assistencial')) {
+    return 'bpc_loas';
+  }
+
+  if (normalized.includes('aposentadoria')) {
+    return 'aposentadoria';
+  }
+
+  if (normalized.includes('pensão') || normalized.includes('pensao') || normalized.includes('morte')) {
+    return 'pensao_morte';
+  }
+
+  if (normalized.includes('revisão') || normalized.includes('revisao') || normalized.includes('valor errado')) {
+    return 'revisao';
+  }
+
+  return 'nao_identificado';
+}
+
 const App: React.FC = () => {
   if (window.location.pathname === '/admin') {
     return <AdminPage />;
@@ -90,7 +121,14 @@ const App: React.FC = () => {
       '';
   
       try {
-        await saveSession(sessionId, selectedService, conversationData);
+        await saveSession(
+          sessionId,
+          selectedService,
+          conversationData,
+          {
+            tipo_beneficio: detectBenefitFromConversation(conversationData)
+          }
+        );
       } catch (e) {
         console.warn("Erro ao salvar sessão antes da geração:", e);
       }

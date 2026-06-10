@@ -97,13 +97,25 @@ export async function checkPaymentStatus(sessionId: string): Promise<StatusResul
 export async function saveSession(
   sessionId: string,
   serviceType: string,
-  conversationData: unknown
+  conversationData: unknown,
+  extraData?: {
+    tipo_beneficio?: string;
+    problema_principal?: string;
+    nome?: string;
+    telefone?: string;
+    email?: string;
+  }
 ): Promise<void> {
   try {
     await fetch(`${API_BASE}/api/session`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId, serviceType, conversationData }),
+      body: JSON.stringify({
+        sessionId,
+        serviceType,
+        conversationData,
+        ...extraData,
+      }),
     });
   } catch (e) {
     console.warn('saveSession fallback to localStorage only', e);
