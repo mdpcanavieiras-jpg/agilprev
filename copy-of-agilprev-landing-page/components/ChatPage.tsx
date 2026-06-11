@@ -302,6 +302,24 @@ await new Promise(r => setTimeout(r, typingDelay));
     const botMsg: UIMessage = { id: messages.length + 2, role: 'assistant', content: result.message, time: nowTime() };
     setMessages(p => [...p, botMsg]);
     if (result.quickReplies?.length && !result.documentReady) setQuickReplies(result.quickReplies);
+    const hasUserName = all.some(m =>
+      m.role === 'user' &&
+      /^[A-Za-zÀ-ÿ]{2,}\s+[A-Za-zÀ-ÿ]{2,}/.test(m.content.trim())
+    );
+    
+    if (result.documentReady && !hasUserName) {
+      const askName: UIMessage = {
+        id: all.length + 1,
+        role: 'assistant',
+        content: 'Antes de gerar o documento, preciso do seu nome completo. Qual é o seu nome completo?',
+        time: nowTime(),
+      };
+    
+      setMessages([...all, askName]);
+      setLoading(false);
+      return;
+    }
+    
     if (result.documentReady) {
       localStorage.setItem('agil_chat_document', JSON.stringify(result.message));
       setDocumentReady(true);
