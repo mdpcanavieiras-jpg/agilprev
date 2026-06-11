@@ -41,6 +41,20 @@ function trackEvent(eventName: string, params = {}) {
   }
 }
 
+function detectNameFromConversation(text: string): string {
+  try {
+    const messages = JSON.parse(text);
+    const firstUserMessage = messages.find((m: any) =>
+      m.role === 'user' &&
+      /^[A-Za-zÀ-ÿ]{2,}\s+[A-Za-zÀ-ÿ]{2,}/.test(String(m.content).trim())
+    );
+
+    return firstUserMessage?.content?.trim() || '';
+  } catch {
+    return '';
+  }
+}
+
 function detectBenefitFromConversation(text: string): string {
   const normalized = text.toLowerCase();
 
@@ -126,7 +140,8 @@ const App: React.FC = () => {
           selectedService,
           conversationData,
           {
-            tipo_beneficio: detectBenefitFromConversation(conversationData)
+            tipo_beneficio: detectBenefitFromConversation(String(conversationData)),
+            nome: detectNameFromConversation(String(conversationData))
           }
         );
       } catch (e) {
