@@ -93,7 +93,7 @@ const PreviewDocumentPage: React.FC<PreviewDocumentPageProps> = ({
             <button onClick={onBack} aria-label="Voltar" className="p-2 rounded-xl text-slate-400 hover:bg-slate-50">
               <ArrowLeft size={22} />
             </button>
-            <img src={LOGO} alt="Agilprev" className="h-9 w-auto object-contain" />
+            <img src="/agilprev-watermark.png" alt="Agilprev" className="h-9 w-auto object-contain" />
             <div>
               <p className="font-black text-slate-800 text-sm leading-none">Seu documento está pronto</p>
               <p className="text-[11px] text-slate-400 mt-0.5">Desbloqueie o PDF completo abaixo</p>
