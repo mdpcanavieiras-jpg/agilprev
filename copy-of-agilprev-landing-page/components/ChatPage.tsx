@@ -302,10 +302,28 @@ await new Promise(r => setTimeout(r, typingDelay));
     const botMsg: UIMessage = { id: messages.length + 2, role: 'assistant', content: result.message, time: nowTime() };
     setMessages(p => [...p, botMsg]);
     if (result.quickReplies?.length && !result.documentReady) setQuickReplies(result.quickReplies);
-    const hasUserName = all.some(m =>
-      m.role === 'user' &&
-      /^[A-Za-zÀ-ÿ]{2,}\s+[A-Za-zÀ-ÿ]{2,}/.test(m.content.trim())
-    );
+    const hasUserName = all.some((m, index) => {
+      if (m.role !== 'user') return false;
+    
+      const previousMessage = all[index - 1]?.content?.toLowerCase() || '';
+      const answer = m.content.trim();
+    
+      const wasAskedName =
+        previousMessage.includes('nome completo') ||
+        previousMessage.includes('qual é o seu nome');
+    
+      const looksLikeFullName =
+        /^[A-Za-zÀ-ÿ]{2,}\s+[A-Za-zÀ-ÿ]{2,}/.test(answer) &&
+        !answer.toLowerCase().includes('rua') &&
+        !answer.toLowerCase().includes('auxílio') &&
+        !answer.toLowerCase().includes('aposentadoria') &&
+        !answer.toLowerCase().includes('maternidade') &&
+        !answer.toLowerCase().includes('bpc') &&
+        !answer.toLowerCase().includes('loas') &&
+        !answer.toLowerCase().includes('inss');
+    
+      return wasAskedName && looksLikeFullName;
+    });
     
     if (result.documentReady && !hasUserName) {
       const askName: UIMessage = {
