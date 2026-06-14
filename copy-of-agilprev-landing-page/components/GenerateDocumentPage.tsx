@@ -193,7 +193,7 @@ const GenerateDocumentPage: React.FC<GenerateDocumentPageProps> = ({
           <button onClick={onBack} aria-label="Voltar" className="p-2 rounded-xl text-slate-400 hover:bg-slate-50 transition-all">
             <ArrowLeft size={22} />
           </button>
-          <img src={LOGO} alt="Agilprev" className="h-9 w-auto object-contain" />
+          <img src="/agilprev-watermark.png" alt="Agilprev" className="h-9 w-auto object-contain" />
           <span className="font-black text-slate-800 text-sm">Gerando Documento</span>
         </div>
       </header>
