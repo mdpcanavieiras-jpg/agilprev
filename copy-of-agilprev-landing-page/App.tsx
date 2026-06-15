@@ -44,12 +44,37 @@ function trackEvent(eventName: string, params = {}) {
 function detectNameFromConversation(text: string): string {
   try {
     const messages = JSON.parse(text);
-    const firstUserMessage = messages.find((m: any) =>
-      m.role === 'user' &&
-      /^[A-Za-zÀ-ÿ]{2,}\s+[A-Za-zÀ-ÿ]{2,}/.test(String(m.content).trim())
-    );
 
-    return firstUserMessage?.content?.trim() || '';
+    for (let i = 0; i < messages.length; i++) {
+      const current = messages[i];
+      const previous = messages[i - 1];
+
+      if (current?.role !== 'user') continue;
+
+      const previousText = String(previous?.content || '').toLowerCase();
+      const answer = String(current?.content || '').trim();
+
+      const wasAskedName =
+        previousText.includes('nome completo') ||
+        previousText.includes('qual é o seu nome');
+
+      const looksLikeName =
+        /^[A-Za-zÀ-ÿ]{2,}\s+[A-Za-zÀ-ÿ]{2,}/.test(answer) &&
+        !answer.toLowerCase().includes('rua') &&
+        !answer.toLowerCase().includes('auxílio') &&
+        !answer.toLowerCase().includes('auxilio') &&
+        !answer.toLowerCase().includes('aposentadoria') &&
+        !answer.toLowerCase().includes('maternidade') &&
+        !answer.toLowerCase().includes('bpc') &&
+        !answer.toLowerCase().includes('loas') &&
+        !answer.toLowerCase().includes('inss');
+
+      if (wasAskedName && looksLikeName) {
+        return answer;
+      }
+    }
+
+    return '';
   } catch {
     return '';
   }
