@@ -95,10 +95,8 @@ const App: React.FC = () => {
   const [generatedDoc, setGeneratedDoc]   = useState<string>('');
 
 
-  const [sessionId] = useState<string>(() => {
-    const saved = localStorage.getItem('agil_session_id');
-    if (saved) return saved;
-    const id = uuidv4();
+  const [sessionId, setSessionId] = useState<string>(() => {
+    const id = `sess_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     localStorage.setItem('agil_session_id', id);
     return id;
   });
@@ -108,13 +106,13 @@ const App: React.FC = () => {
   const closeModal = () => setIsModalOpen(false);
 
   const startChat = (type: 'hero' | 'documento' | 'premium') => {
-    trackEvent("inicio_chat", {
-      origem: type
-    });
-    
-    trackEvent("produto_escolhido", {
+    const newSessionId = `sess_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    localStorage.setItem('agil_session_id', newSessionId);
+    setSessionId(newSessionId);
+  
+    trackEvent('inicio_chat', {
       produto: type,
-      valor: type === "premium" ? 59 : type === "documento" ? 29 : 0
+      valor: type === 'premium' ? 59 : type === 'documento' ? 29 : 0
     });
     
     setSelectedService(type);
