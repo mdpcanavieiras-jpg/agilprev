@@ -156,20 +156,28 @@ const App: React.FC = () => {
       localStorage.getItem('agil_conversation_data') ||
       localStorage.getItem('agil_chat_document') ||
       '';
+
+    const detectedBeneficio = detectBenefitFromConversation(String(conversationData));
+    const detectedNome = detectNameFromConversation(String(conversationData));
+
+    const extraData: { tipo_beneficio?: string; nome?: string } = {};
+    if (detectedBeneficio && detectedBeneficio.trim()) {
+      extraData.tipo_beneficio = detectedBeneficio;
+    }
+    if (detectedNome && detectedNome.trim()) {
+      extraData.nome = detectedNome;
+    }
   
-      try {
-        await saveSession(
-          sessionId,
-          selectedService,
-          conversationData,
-          {
-            tipo_beneficio: detectBenefitFromConversation(String(conversationData)),
-            nome: detectNameFromConversation(String(conversationData))
-          }
-        );
-      } catch (e) {
-        console.warn("Erro ao salvar sessão antes da geração:", e);
-      }
+    try {
+      await saveSession(
+        sessionId,
+        selectedService,
+        conversationData,
+        extraData
+      );
+    } catch (e) {
+      console.warn("Erro ao salvar sessão antes da geração:", e);
+    }
   
     window.scrollTo(0, 0);
     setCurrentView('generating');

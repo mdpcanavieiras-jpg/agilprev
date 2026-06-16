@@ -90,16 +90,32 @@ app.post('/api/session', async (req, res) => {
     } = req.body;
     const id = sessionId || uuidv4();
 
+    const { data: existingSession } = await supabase
+      .from('agil_sessions')
+      .select('nome, tipo_beneficio')
+      .eq('id', id)
+      .single();
+
+    let finalNome = nome;
+    if ((!finalNome || String(finalNome).trim() === '') && existingSession && existingSession.nome) {
+      finalNome = existingSession.nome;
+    }
+
+    let finalTipoBeneficio = tipo_beneficio;
+    if ((!finalTipoBeneficio || String(finalTipoBeneficio).trim() === '') && existingSession && existingSession.tipo_beneficio) {
+      finalTipoBeneficio = existingSession.tipo_beneficio;
+    }
+
     const { error } = await supabase
       .from('agil_sessions')
       .upsert({
         id,
         service_type: serviceType,
         conversation_data: conversationData,
-        nome,
+        nome: finalNome,
         email,
         produto: produto || serviceType,
-        tipo_beneficio: tipo_beneficio || null,
+        tipo_beneficio: finalTipoBeneficio || null,
         problema_principal: problema_principal || null,
         origem: origem || 'site',
         status_funil: status_funil || 'iniciado',
